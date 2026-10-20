@@ -4,9 +4,11 @@ Länk till slutversionens commit, fylls i vid inlämningen:
 
 ## Teamet
 
-- Teamnamn:
+- Teamnamn: Grupp 6
 - Teammedlemmar och GitHub-användarnamn:
-- Teamets fork:
+  - Mustafa Alshammaa (desiboli)
+  - Nicklas Karlsson (yrrving)
+- Teamets fork: https://github.com/desiboli/kundportal-ai-native-development
 
 ## Gruppens underlag
 
