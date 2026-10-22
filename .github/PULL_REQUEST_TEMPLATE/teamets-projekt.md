@@ -8,6 +8,7 @@ Länk till slutversionens commit, fylls i vid inlämningen:
 - Teammedlemmar och GitHub-användarnamn:
   - Mustafa Alshammaa (desiboli)
   - Nicklas Karlsson (yrrving)
+  - Azalea Alothmani (Azaalea)
 - Teamets fork: https://github.com/desiboli/kundportal-ai-native-development
 
 ## Gruppens underlag
