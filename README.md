@@ -16,7 +16,7 @@ cd backend
 py -3.11 -m venv .venv
 .\.venv\Scripts\python -m pip install -r requirements.txt
 .\.venv\Scripts\python -m pytest -q
-.\.venv\Scripts\python -m uvicorn app.main:app --reload --reload-dir app
+.\.venv\Scripts\python -m uvicorn app.main:app --reload --reload-dir app --port 8010
 ```
 
 **Backend, macOS/Linux**
@@ -26,10 +26,10 @@ cd backend
 python3.11 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
 .venv/bin/python -m pytest -q
-.venv/bin/python -m uvicorn app.main:app --reload --reload-dir app
+.venv/bin/python -m uvicorn app.main:app --reload --reload-dir app --port 8010
 ```
 
-Kontrollera att http://localhost:8000/health svarar `{"status": "ok", "database": "ok"}`. API-dokumentationen finns på http://localhost:8000/docs. Om port 8000 är upptagen: lägg till `--port 8010`.
+Projektet körs på **port 8010** (inte uvicorns standard 8000, som ofta används av andra lokala appar). Kontrollera att http://localhost:8010/health svarar `{"status": "ok", "database": "ok"}`, inte bara statuskod 200: svarar något annat är det ett annat program på porten. API-dokumentationen finns på http://localhost:8010/docs.
 
 Databasen är en SQLite-fil i `backend/data/app.db` som skapas vid första start. Sökvägen kan ändras med miljövariabeln `DATABASE_URL`.
 
