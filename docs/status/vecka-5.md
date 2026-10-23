@@ -21,7 +21,7 @@ spec för kärnan och verifieringsplan (Nicklas), backendskelett (Azalea), front
 
 | Vad | Vem | Länk |
 | --- | --- | --- |
-| Fork och löpande PR till kursens repository | Mustafa | löpande PR till kursens repository: https://github.com/Technigo/kundportal-ai-native-development/pull/2 |
+| Fork och löpande PR till kursens repository | Mustafa | Löpande PR till kursens repository: https://github.com/Technigo/kundportal-ai-native-development/pull/2 |
 | Teammedlemmar i PR-mallen, alla fyra | Azalea, Amalia | PR #1 (Azalea i PR-mallen): https://github.com/desiboli/kundportal-ai-native-development/pull/1 (Azalea, mergad), PR #2 (Amalia i PR-mallen): https://github.com/desiboli/kundportal-ai-native-development/pull/2 (Amalia, granskad och godkänd av Azalea, mergad 2026-10-23) |
 | Push-åtkomst till forken kontrollerad | Azalea, Amalia | Pushade branches och PR:er ovan |
 | Linear-projekt, milstolpar och ärendemallar | Mustafa | [Linear: Kundserviceportalen](https://linear.app/grupp6/project/kundserviceportalen-be4a4840b5ef) |
@@ -43,7 +43,7 @@ spec för kärnan och verifieringsplan (Nicklas), backendskelett (Azalea), front
 - Kodgranskning i GitHub: Azalea granskade PR #2 (Amalia i PR-mallen): https://github.com/desiboli/kundportal-ai-native-development/pull/2 (kontrollerade att raden har samma format
   som övriga och att användarnamnet stämmer med Amalias konto) och godkände innan merge.
 
-**Granskningar som väntar:** PR #3 (backendskelett: FastAPI, SQLite och /health): https://github.com/desiboli/kundportal-ai-native-development/pull/3 (backendskelett) och PR #4 (spec, ansvar och veckostatus V5): https://github.com/desiboli/kundportal-ai-native-development/pull/4 (spec, ansvar, veckostatus).
+**Granskningar som väntar:** PR #3 (backendskelett: FastAPI, SQLite och /health): https://github.com/desiboli/kundportal-ai-native-development/pull/3 och PR #4 (spec, ansvar och veckostatus V5): https://github.com/desiboli/kundportal-ai-native-development/pull/4 (spec, ansvar, veckostatus).
 Granskare på båda: Nicklas, Mustafa och Amalia.
 
 ## Osäkert eller ofärdigt
