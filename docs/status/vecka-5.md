@@ -36,7 +36,9 @@ spec för kärnan och verifieringsplan (Nicklas), backendskelett (Azalea), front
 - Backendskelettet: `pytest -q` ger `4 passed` (2026-10-23). Testerna kontrollerar bland
   annat att `/health` faktiskt frågar databasen och svarar 503 med svenskt meddelande om
   den inte går att nå.
-- Manuellt: `uvicorn` startar och `/health` svarar `{"status":"ok","database":"ok"}`.
+- Manuellt: `uvicorn` startar och `/health` svarar `{"status":"ok","database":"ok"}` på
+  port 8010. 8010 är projektets standardport, eftersom 8000 redan användes av en annan
+  lokal app och svarade med fel innehåll (upptäckt genom att läsa svaret, inte bara statuskoden).
 - Specen granskad av Nicklas och Amalia (synpunkter i Slack, inarbetade i v0.3).
 - Kodgranskning i GitHub: Azalea granskade #2 (kontrollerade att raden har samma format
   som övriga och att användarnamnet stämmer med Amalias konto) och godkände innan merge.

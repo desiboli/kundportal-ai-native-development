@@ -256,7 +256,7 @@ py -3.11 -m venv .venv
 .\.venv\Scripts\python -m pip install -r requirements.txt
 .\.venv\Scripts\python -m pytest -q                        # alla tester
 .\.venv\Scripts\python -m pytest -q -k history             # endast historiktester
-.\.venv\Scripts\python -m uvicorn app.main:app --reload --reload-dir app    # http://localhost:8000/docs
+.\.venv\Scripts\python -m uvicorn app.main:app --reload --reload-dir app --port 8010   # http://localhost:8010/docs
 ```
 
 **Backend, macOS/Linux**
@@ -266,7 +266,7 @@ cd backend
 python3.11 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
 .venv/bin/python -m pytest -q
-.venv/bin/python -m uvicorn app.main:app --reload --reload-dir app
+.venv/bin/python -m uvicorn app.main:app --reload --reload-dir app --port 8010
 ```
 
 `--reload-dir app` gör att servern bara startar om när vår egen kod ändras. Utan den
@@ -282,8 +282,7 @@ npm run dev                     # http://localhost:5173
 npm test                        # vitest
 ```
 
-**Om port 8000 är upptagen** (ett annat program svarar där): lägg till `--port 8010`
-och kontrollera att `/health` svarar `{"status": "ok", "database": "ok"}`, inte bara 200.
+**Port 8010.** Projektet körs på 8010, inte uvicorns standard 8000, eftersom 8000 ofta används av andra lokala appar. Kontrollera att `/health` svarar `{"status": "ok", "database": "ok"}`, inte bara 200: svarar något annat är det ett annat program på porten.
 
 ## 9. Projektstruktur (förslag)
 
