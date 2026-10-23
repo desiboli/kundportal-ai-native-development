@@ -29,6 +29,7 @@ spec för kärnan och verifieringsplan (Nicklas), backendskelett (Azalea), front
 | Arbetsfördelning | Alla (förslag) | [docs/ansvar-och-granskning.md](../ansvar-och-granskning.md) |
 | Backendskelett: FastAPI, SQLite, `GET /health`, körinstruktioner | Azalea | [#3](https://github.com/desiboli/kundportal-ai-native-development/pull/3) (väntar på granskning) |
 | Feedback på specen och mallarna | Nicklas, Amalia | Slack, inarbetat i spec v0.3 |
+| Svar på feedbacken och sammanfattning av spec v0.3 till teamet | Azalea | Slack 2026-10-23 |
 
 ## Verifierat
 
@@ -40,8 +41,8 @@ spec för kärnan och verifieringsplan (Nicklas), backendskelett (Azalea), front
 - Kodgranskning i GitHub: Azalea granskade #2 (kontrollerade att raden har samma format
   som övriga och att användarnamnet stämmer med Amalias konto) och godkände innan merge.
 
-**Granskningar som väntar:** #3 (backendskelett, granskare Nicklas) och #4 (spec, ansvar,
-veckostatus, granskare Nicklas och Mustafa).
+**Granskningar som väntar:** #3 (backendskelett) och #4 (spec, ansvar, veckostatus).
+Granskare på båda: Nicklas, Mustafa och Amalia.
 
 ## Osäkert eller ofärdigt
 
