@@ -1,0 +1,30 @@
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+from app.api import health
+from app.config import database_url_from_env
+from app.db import Base, ensure_sqlite_directory
+
+
+def create_app(database_url: str | None = None) -> FastAPI:
+    """Bygger appen mot en given databas. Tester skickar in en temporär fil."""
+    engine = create_engine(database_url or database_url_from_env())
+
+    @asynccontextmanager
+    async def lifespan(app: FastAPI):
+        ensure_sqlite_directory(engine)
+        Base.metadata.create_all(engine)
+        yield
+        engine.dispose()
+
+    app = FastAPI(title="Kundserviceportalen", lifespan=lifespan)
+    app.state.session_factory = sessionmaker(engine)
+    app.include_router(health.router)
+    return app
+
+
+# Används av `uvicorn app.main:app`. create_engine ansluter inte förrän appen startar.
+app = create_app()
