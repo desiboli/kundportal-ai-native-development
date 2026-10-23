@@ -23,7 +23,7 @@
 | **Azalea** (Azaalea) | Backend som helhet: skelett, kärnans API, statuslogik och historik, API-kontraktet |
 | **Nicklas** (yrrving) | CORE-specen, tester för statusregler och validering, verifieringsplanen, teknikbeslutet om stacken |
 | **Mustafa** (desiboli) | Frontend och Linear |
-| **Amalia** | Väljer själv: tidslinje och felmeddelanden i UI, eller en egen tilläggsfunktion (t.ex. sök och filtrering) |
+| **Amalia** (amaliaa-91) | Väljer själv: tidslinje och felmeddelanden i UI, eller en egen tilläggsfunktion (t.ex. sök och filtrering) |
 
 ## Ansvarstabell
 

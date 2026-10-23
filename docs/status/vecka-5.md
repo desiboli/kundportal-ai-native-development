@@ -1,6 +1,7 @@
 # Veckostatus vecka 5: Projektstart och specifikation
 
-> Utkast 2026-10-23 (Azalea). Kompletteras av teamet efter mötet söndag 2026-10-25.
+> Utkast, senast uppdaterat 2026-10-23 kl. 21 (Azalea). Kompletteras av teamet efter
+> mötet söndag 2026-10-25.
 > Jämför med veckans förväntningar i Disco.
 
 ## Planerat
@@ -21,7 +22,8 @@ spec för kärnan och verifieringsplan (Nicklas), backendskelett (Azalea), front
 | Vad | Vem | Länk |
 | --- | --- | --- |
 | Fork och löpande PR till kursens repository | Mustafa | [Technigo/kundportal-ai-native-development#2](https://github.com/Technigo/kundportal-ai-native-development/pull/2) |
-| Teammedlemmar i PR-mallen | Azalea, Amalia | [#1](https://github.com/desiboli/kundportal-ai-native-development/pull/1) (mergad), [#2](https://github.com/desiboli/kundportal-ai-native-development/pull/2) (öppen) |
+| Teammedlemmar i PR-mallen, alla fyra | Azalea, Amalia | [#1](https://github.com/desiboli/kundportal-ai-native-development/pull/1) (Azalea, mergad), [#2](https://github.com/desiboli/kundportal-ai-native-development/pull/2) (Amalia, granskad och godkänd av Azalea, mergad 2026-10-23) |
+| Push-åtkomst till forken kontrollerad | Azalea, Amalia | Pushade branches och PR:er ovan |
 | Linear-projekt, milstolpar och ärendemallar | Mustafa | [Linear: Kundserviceportalen](https://linear.app/grupp6/project/kundserviceportalen-be4a4840b5ef) |
 | Spec v0.3: statuslogik och ärendehistorik, acceptanskriterier HIST-01–14, teststrategi | Azalea | [docs/specs/SPEC-arendehistorik.md](../specs/SPEC-arendehistorik.md) |
 | Arbetsfördelning | Alla (förslag) | [docs/ansvar-och-granskning.md](../ansvar-och-granskning.md) |
@@ -35,6 +37,11 @@ spec för kärnan och verifieringsplan (Nicklas), backendskelett (Azalea), front
   den inte går att nå.
 - Manuellt: `uvicorn` startar och `/health` svarar `{"status":"ok","database":"ok"}`.
 - Specen granskad av Nicklas och Amalia (synpunkter i Slack, inarbetade i v0.3).
+- Kodgranskning i GitHub: Azalea granskade #2 (kontrollerade att raden har samma format
+  som övriga och att användarnamnet stämmer med Amalias konto) och godkände innan merge.
+
+**Granskningar som väntar:** #3 (backendskelett, granskare Nicklas) och #4 (spec, ansvar,
+veckostatus, granskare Nicklas och Mustafa).
 
 ## Osäkert eller ofärdigt
 
@@ -45,6 +52,7 @@ spec för kärnan och verifieringsplan (Nicklas), backendskelett (Azalea), front
 | Spec för kärnan (CORE) saknas | Nicklas har erbjudit sig att skriva den | Första utkast efter söndag |
 | Verifieringsplan saknas | Ägs av Nicklas, bygger på specarna | Första utkast vecka 6 |
 | Arbetsfördelningen är förslag | Ska bekräftas av alla fyra | Söndagsmötet |
+| Beskrivningen i den löpande PR:n saknar Azalea, Amalia och länkar | Bara Mustafa, som öppnade PR:n, kan ändra den | Mustafa uppdaterar när #3 och #4 är mergade |
 | Inga Linear-ärenden per krav än | Strukturen finns, ärendena inte | Skapas efter söndagsmötet |
 
 ## Nästa steg
@@ -57,4 +65,5 @@ spec för kärnan och verifieringsplan (Nicklas), backendskelett (Azalea), front
 | CORE-spec, första utkast | Nicklas |
 | Ärendemodell och `POST`/`GET /tickets` (vecka 6) | Azalea |
 | Linear-ärenden per krav-id | Mustafa (alla lägger in sina) |
+| Uppdatera beskrivningen i den löpande PR:n med alla fyra och länkar | Mustafa |
 | Amalias egen del | Amalia |
