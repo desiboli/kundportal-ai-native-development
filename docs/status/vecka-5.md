@@ -30,6 +30,8 @@ spec för kärnan och verifieringsplan (Nicklas), backendskelett (Azalea), front
 | Arbetsfördelning | Alla (förslag) | [docs/ansvar-och-granskning.md](../ansvar-och-granskning.md), i samma PR #4 (spec, ansvar och veckostatus V5): https://github.com/desiboli/kundportal-ai-native-development/pull/4 |
 | Backendskelett: FastAPI, SQLite, `GET /health`, körinstruktioner i README, port 8010 | Azalea | PR #3 (backendskelett: FastAPI, SQLite och /health): https://github.com/desiboli/kundportal-ai-native-development/pull/3 (godkänd av Mustafa, mergad 2026-10-23) |
 | Spec för kärnan v0.1: CORE-01–16, felmeddelanden, gränsfall, mutationer, beslut B1–B7 | Nicklas | PR #5 (spec för kärnan, CORE-01–16): https://github.com/desiboli/kundportal-ai-native-development/pull/5 (granskad av Azalea, ändringar begärda) |
+| Amalia har valt sin del: tidslinjen (HIST-05) och UI-delen av HIST-14 | Amalia | PR #7 (Amalia tar tidslinje och felmeddelanden i UI, HIST-05 och HIST-14): https://github.com/desiboli/kundportal-ai-native-development/pull/7 (godkänd av Azalea) |
+| HIST-spec v0.4: Amalias del och uppdelningen av HIST-14 i backend- och UI-del | Azalea | PR #8 (HIST-spec v0.4, Amalias del): https://github.com/desiboli/kundportal-ai-native-development/pull/8 |
 | Feedback på specen och mallarna | Nicklas, Amalia | Slack, inarbetat i spec v0.3 |
 | Svar på feedbacken och sammanfattning av spec v0.3 till teamet | Azalea | Slack 2026-10-23 |
 
@@ -53,6 +55,9 @@ spec för kärnan och verifieringsplan (Nicklas), backendskelett (Azalea), front
     API-konventionerna och HIST-specen: nio radkommentarer (bl.a. ordningen på felmeddelanden,
     svenskt meddelande vid fel typ, id som inte är ett tal, hur tecken räknas) och
     "Request changes". Nicklas uppdaterar specen.
+  - Azalea granskade PR #7 (Amalia tar tidslinje och felmeddelanden i UI, HIST-05 och HIST-14): https://github.com/desiboli/kundportal-ai-native-development/pull/7 2026-10-24: kontrollerade att diffen
+    bara ändrar de beskrivna raderna och att Linear-dokumentet har samma innehåll. Godkänd
+    med två radkommentarer (UI-delen av HIST-14, test för felmeddelandena).
 
 **Väntar:** Nicklas ändringar i PR #5 (spec för kärnan, CORE-01–16): https://github.com/desiboli/kundportal-ai-native-development/pull/5 efter granskningen.
 
@@ -64,7 +69,7 @@ spec för kärnan och verifieringsplan (Nicklas), backendskelett (Azalea), front
 | Ingen frontend i fullstackgrunden än | Väntar på stackbeslutet | Frontendskelett som anropar `/health`, söndag–måndag |
 | Spec för kärnan är ett utkast | Första version klar, granskning pågår | Granskad av Azalea 2026-10-24 (Request changes, nio punkter). Nicklas uppdaterar, sedan godkänner Azalea |
 | Verifieringsplan saknas | Ägs av Nicklas, bygger på specarna | Första utkast vecka 6 |
-| Arbetsfördelningen är förslag | Ska bekräftas av alla fyra | Söndagsmötet |
+| Arbetsfördelningen är förslag | Ska bekräftas av alla fyra. Amalia har valt sin del | Söndagsmötet |
 | Beskrivningen i den löpande PR:n (Technigo#2): https://github.com/Technigo/kundportal-ai-native-development/pull/2 saknar Azalea, Amalia och länkar | Bara Mustafa, som öppnade PR:n, kan ändra den | Mustafa uppdaterar. PR #3 (backendskelett): https://github.com/desiboli/kundportal-ai-native-development/pull/3 och PR #4 (spec, ansvar och veckostatus V5): https://github.com/desiboli/kundportal-ai-native-development/pull/4 är nu mergade, så länkarna till `docs/` fungerar |
 | Backendskelettet mergades utan att Nicklas hann granska | Mustafa godkände först | Nicklas kan granska i efterhand med kommentarer i PR #3 (backendskelett: FastAPI, SQLite och /health): https://github.com/desiboli/kundportal-ai-native-development/pull/3 |
 | Inga Linear-ärenden per uppgift än | Strukturen och mallarna finns, ärendena inte | Skapas efter söndagsmötet |
@@ -80,4 +85,5 @@ spec för kärnan och verifieringsplan (Nicklas), backendskelett (Azalea), front
 | Ärendemodell och `POST`/`GET /tickets` enligt CORE (vecka 6) | Azalea |
 | Linear-ärenden per uppgift, med krav-id i beskrivningen | Alla lägger in sina |
 | Uppdatera beskrivningen i den löpande PR:n med alla fyra och länkar | Mustafa |
-| Amalias egen del | Amalia |
+| Svara på radkommentarerna i PR #7 (Amalia tar tidslinje och felmeddelanden i UI, HIST-05 och HIST-14): https://github.com/desiboli/kundportal-ai-native-development/pull/7 så att den kan mergas (alla konversationer måste vara lösta) | Amalia |
+| Granska PR #8 (HIST-spec v0.4, Amalias del): https://github.com/desiboli/kundportal-ai-native-development/pull/8 | Amalia, Nicklas |
