@@ -1,6 +1,6 @@
 # Spec: Statuslogik och ärendehistorik (kompletterande funktion)
 
-> Status: **utkast v0.4 för teamgranskning** · Ansvarig: Azalea (Azaalea) · Vecka 5
+> Status: **utkast v0.5 för teamgranskning** · Ansvarig: Azalea (Azaalea) · Vecka 5
 > Detta dokument är teamets underlag. Individuell redovisning ligger inte här.
 >
 > **Ändrat i v0.3 (2026-10-23), efter feedback från teamet:** kärnan får en
@@ -10,6 +10,10 @@
 >
 > **Ändrat i v0.4 (2026-10-24):** Amalia äger tidslinjen (HIST-05) och UI-delen av HIST-14,
 > Azalea backend-delen av HIST-14. Komponenttestet för tidslinjen är Amalias.
+>
+> **Ändrat i v0.5 (2026-10-24), efter CORE-specen v0.2:** HIST-08 ger 404 "Ärendet finns inte."
+> även när id inte är ett heltal (samma som B8 i CORE). HIST-10 prövar bara att ingen
+> historikpost sparas; att inget ärende sparas prövas i CORE.
 
 **Gemensamma dokument (huvudversioner) i Linear.** Delar av specen gäller hela teamet och
 har därför fått egna dokument. Specen är fortfarande komplett, men vid skillnad gäller det
@@ -59,7 +63,7 @@ statusreglerna och `PATCH`, utökar `POST` så att den skriver historik, och lä
 - CORE använder statuskoderna i antagande 2 och felformatet i avsnitt 5
   (`{"detail": "<svenskt meddelande>"}`, även för 422). Ingen av specarna definierar egna.
 - Ett nytt ärende får status `new` (CORE) och en `created`-post (HIST-01) i samma
-  transaktion. Misslyckad validering skapar varken ärende eller post (HIST-10).
+  transaktion. Misslyckad validering skapar varken ärende eller post (ärendet prövas i CORE, historikposten i HIST-10).
 - Status ändras bara via `PATCH /tickets/{id}/status` (HIST). CORE:s endpoints ändrar
   aldrig status.
 
@@ -136,8 +140,8 @@ om `event_type = 'created'`. Poster ändras eller tas aldrig bort av applikation
 | Metod och väg                 | Lyckat svar                                                     | Fel                                                                        |
 | ------------------------------ | --------------------------------------------------------------- | -------------------------------------------------------------------------- |
 | `POST /tickets` (utökas)    | 201, ärendet. Skapar en `created`-post.                      | 422 vid ogiltig indata, då skapas varken ärende eller post               |
-| `PATCH /tickets/{id}/status` | 200, ärendet med ny status. Skapar en `status_changed`-post. | 404 okänt ärende · 422 ogiltig status · 409 samma status som nuvarande |
-| `GET /tickets/{id}/history`  | 200, lista äldst först                                        | 404 okänt ärende                                                         |
+| `PATCH /tickets/{id}/status` | 200, ärendet med ny status. Skapar en `status_changed`-post. | 404 okänt ärende (även id som inte är heltal) · 422 ogiltig status · 409 samma status som nuvarande |
+| `GET /tickets/{id}/history`  | 200, lista äldst först                                        | 404 okänt ärende (även id som inte är heltal)                            |
 
 **Anrop och svar**
 
@@ -187,11 +191,14 @@ HIST-06, 07 och 13 är statusregler, de övriga gäller historiken.
 - **HIST-07** Givet att ärendet redan har status `in_progress`, när samma status skickas,
   då svarar API:t 409, och ingen historikpost skapas.
 - **HIST-08** Givet ett okänt ärende-id, när historik hämtas eller status ändras, då
-  svarar API:t 404 och inget skapas.
+  svarar API:t 404 med "Ärendet finns inte." och inget skapas. Samma gäller ett id som
+  inte är ett heltal, t.ex. `GET /tickets/abc/history` och `PATCH /tickets/abc/status`
+  (samma beslut som B8 i CORE-specen).
 - **HIST-09** Givet att skrivningen av historikposten misslyckas, när status ändras, då
   rullas statusändringen tillbaka och ärendet behåller sin gamla status (atomicitet).
 - **HIST-10** Givet att ärendet inte kan skapas (t.ex. tom rubrik), när `POST` körs, då
-  finns varken ärende eller historikpost kvar.
+  finns ingen historikpost kvar. (Att inget *ärende* sparas prövas i CORE-06–09, 11–13
+  och 17. HIST-10 prövar bara historiken, så samma fall testas inte två gånger.)
 
 **Gränsfall**
 
