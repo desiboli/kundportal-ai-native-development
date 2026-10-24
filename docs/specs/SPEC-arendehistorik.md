@@ -1,12 +1,15 @@
 # Spec: Statuslogik och ärendehistorik (kompletterande funktion)
 
-> Status: **utkast v0.3 för teamgranskning** · Ansvarig: Azalea (Azaalea) · Vecka 5
+> Status: **utkast v0.4 för teamgranskning** · Ansvarig: Azalea (Azaalea) · Vecka 5
 > Detta dokument är teamets underlag. Individuell redovisning ligger inte här.
 >
 > **Ändrat i v0.3 (2026-10-23), efter feedback från teamet:** kärnan får en
 > egen spec (CORE-id, Nicklas), stacken är ett öppet beslut till söndag den 25/10, alla fyra i
 > teamet finns i ansvarstabellen, frontend ligger inte längre på Azalea, mutationsprövningen
 > görs korsvis, och kraven speglas i Linear med krav-id.
+>
+> **Ändrat i v0.4 (2026-10-24):** Amalia äger tidslinjen (HIST-05) och UI-delen av HIST-14,
+> Azalea backend-delen av HIST-14. Komponenttestet för tidslinjen är Amalias.
 
 **Gemensamma dokument (huvudversioner) i Linear.** Delar av specen gäller hela teamet och
 har därför fått egna dokument. Specen är fortfarande komplett, men vid skillnad gäller det
@@ -77,7 +80,8 @@ statusreglerna och `PATCH`, utökar `POST` så att den skriver historik, och lä
 | Instruktion för testförslag: v1                                                                                                           | Nicklas                        | Azalea          | Förslag                                         |
 | Förbättring av instruktionen: **var och en gör en egen, namngiven förbättring**, prövad på egna kriterier och jämförd med v1 | Azalea, Nicklas (var för sig) | den andra       | Förslag                                         |
 | Frontend: lista, detaljvy, formulär för att skapa ärenden, statusbyte, vitest                                                            | Mustafa                        | Azalea          | Förslag                                         |
-| Tidslinje (HIST-05) och felmeddelanden i UI (HIST-14), **eller** egen tilläggsfunktion (t.ex. sök och filtrering, egen spec)        | Amalia (väljer själv)        | Mustafa, Azalea | Förslag                                         |
+| Tidslinje (HIST-05) och **UI-delen av HIST-14** (felmeddelanden i UI), med komponenttest för tidslinjen | Amalia | Mustafa, Azalea | Valt av Amalia 2026-10-24, bekräftas söndag |
+| **Backend-delen av HIST-14:** alla fel som `{"detail": "<svenska>"}` utan stacktrace eller databasdetaljer | Azalea | Nicklas | Förslag |
 | Linear: milstolpar, ärenden och mallar (Nicklas lägger till fält för krav-id och "faller av rätt anledning")                           | Mustafa                        | Nicklas         | Förslag                                         |
 
 Azalea bygger inte frontend. Hon granskar frontend-PR:er som rör API-kontraktet.
@@ -203,6 +207,7 @@ HIST-06, 07 och 13 är statusregler, de övriga gäller historiken.
 
 - **HIST-14** Felmeddelanden är på svenska och innehåller aldrig stacktrace eller
   databasdetaljer. (Automatiskt: format och språk. Manuellt: begriplighet.)
+  Backend-delen (felformatet) ägs av Azalea, UI-delen (hur felen visas) av Amalia.
 
 **Invariant (kontrolleras efter varje integrationsscenario, se ADR-001):** historikens
 senaste `to_status` är lika med ärendets `status`.
@@ -301,7 +306,7 @@ docs/{specs/, decisions/, status/, verifiering.md}
 | Integration (API + riktig SQLite-fil) | Hela kedjan router → service → databas                    | pytest + TestClient, temporär fil   | HIST-01–03, 08, 10–12                                        | Azalea               |
 | Integration, omstart                  | Ny engine mot samma fil                                     | pytest, temporär fil                | HIST-04                                                        | Azalea               |
 | Integration, fel injicerat            | Tvinga historikinsättning att kasta fel                    | pytest + monkeypatch                 | HIST-09                                                        | Azalea               |
-| Komponent                             | Tidslinjen renderar poster i ordning                        | vitest + Testing Library             | HIST-05                                                        | Amalia eller Mustafa |
+| Komponent                             | Tidslinjen renderar poster i ordning                        | vitest + Testing Library             | HIST-05                                                        | Amalia |
 | Mutation                              | Testerna faller av rätt anledning (tabellen nedan)         | pytest, tillfälliga kodändringar   | HIST-01–04, 09 (Azalea) · HIST-06, 07, 13 och CORE (Nicklas) | Azalea, Nicklas      |
 | Manuell                               | Meddelandens begriplighet, helhetsflöde                    | Checklista i `docs/verifiering.md` | HIST-14                                                        | Nicklas              |
 
@@ -363,8 +368,8 @@ test → körresultat i `docs/verifiering.md`.
 3. Ska `closed` kunna öppnas igen? (Jag antar ja, HIST-13.)
 4. Azalea tar backend som helhet (skelett, CORE och HIST) och bygger inte frontend. Ok?
 5. Mustafa: frontend (lista, detaljvy, formulär, statusbyte). Ok?
-6. Amalia: vilken egen del vill du ha? Förslag: tidslinjen och felmeddelanden i UI
-   (HIST-05, 14), eller en egen tilläggsfunktion som sök och filtrering med egen spec.
+6. ~~Amalia: vilken egen del?~~ Amalia har valt tidslinjen (HIST-05) och UI-delen av
+   HIST-14, se PR #7 (Amalia tar tidslinje och felmeddelanden i UI, HIST-05 och HIST-14): https://github.com/desiboli/kundportal-ai-native-development/pull/7. Bekräftas söndag.
 7. Instruktionen för testförslag: Nicklas skriver v1, och var och en gör sedan en egen,
    namngiven förbättring som prövas på egna kriterier. Ok?
 8. Mutationsprövning korsvis enligt avsnitt 10. Ok?
