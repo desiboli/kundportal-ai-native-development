@@ -29,7 +29,7 @@ spec för kärnan och verifieringsplan (Nicklas), backendskelett (Azalea), front
 | Spec v0.3: statuslogik och ärendehistorik, acceptanskriterier HIST-01–14, teststrategi | Azalea | [docs/specs/SPEC-arendehistorik.md](../specs/SPEC-arendehistorik.md), PR #4 (spec, ansvar och veckostatus V5): https://github.com/desiboli/kundportal-ai-native-development/pull/4 (godkänd av Mustafa, mergad 2026-10-23) |
 | Arbetsfördelning | Alla (förslag) | [docs/ansvar-och-granskning.md](../ansvar-och-granskning.md), i samma PR #4 (spec, ansvar och veckostatus V5): https://github.com/desiboli/kundportal-ai-native-development/pull/4 |
 | Backendskelett: FastAPI, SQLite, `GET /health`, körinstruktioner i README, port 8010 | Azalea | PR #3 (backendskelett: FastAPI, SQLite och /health): https://github.com/desiboli/kundportal-ai-native-development/pull/3 (godkänd av Mustafa, mergad 2026-10-23) |
-| Spec för kärnan v0.1: CORE-01–16, felmeddelanden, gränsfall, mutationer, beslut B1–B7 | Nicklas | PR #5 (spec för kärnan, CORE-01–16): https://github.com/desiboli/kundportal-ai-native-development/pull/5 (granskas av Azalea) |
+| Spec för kärnan v0.1: CORE-01–16, felmeddelanden, gränsfall, mutationer, beslut B1–B7 | Nicklas | PR #5 (spec för kärnan, CORE-01–16): https://github.com/desiboli/kundportal-ai-native-development/pull/5 (granskad av Azalea, ändringar begärda) |
 | Feedback på specen och mallarna | Nicklas, Amalia | Slack, inarbetat i spec v0.3 |
 | Svar på feedbacken och sammanfattning av spec v0.3 till teamet | Azalea | Slack 2026-10-23 |
 
@@ -49,8 +49,12 @@ spec för kärnan och verifieringsplan (Nicklas), backendskelett (Azalea), front
   - Mustafa godkände PR #3 (backendskelett: FastAPI, SQLite och /health): https://github.com/desiboli/kundportal-ai-native-development/pull/3
     och PR #4 (spec, ansvar och veckostatus V5): https://github.com/desiboli/kundportal-ai-native-development/pull/4
     och mergade dem 2026-10-23. Godkännandena saknar kommentar om vad som kontrollerades.
+  - Azalea granskade PR #5 (spec för kärnan, CORE-01–16): https://github.com/desiboli/kundportal-ai-native-development/pull/5 2026-10-24 mot
+    API-konventionerna och HIST-specen: nio radkommentarer (bl.a. ordningen på felmeddelanden,
+    svenskt meddelande vid fel typ, id som inte är ett tal, hur tecken räknas) och
+    "Request changes". Nicklas uppdaterar specen.
 
-**Granskning som väntar:** PR #5 (spec för kärnan, CORE-01–16): https://github.com/desiboli/kundportal-ai-native-development/pull/5, granskare Azalea.
+**Väntar:** Nicklas ändringar i PR #5 (spec för kärnan, CORE-01–16): https://github.com/desiboli/kundportal-ai-native-development/pull/5 efter granskningen.
 
 ## Osäkert eller ofärdigt
 
@@ -58,7 +62,7 @@ spec för kärnan och verifieringsplan (Nicklas), backendskelett (Azalea), front
 | --- | --- | --- |
 | Stacken är inte beslutad | Mustafa föreslog TypeScript rakt igenom som alternativ till FastAPI | Beslutas söndag, Nicklas dokumenterar i `docs/decisions/` |
 | Ingen frontend i fullstackgrunden än | Väntar på stackbeslutet | Frontendskelett som anropar `/health`, söndag–måndag |
-| Spec för kärnan är ett utkast | Första version klar, granskning pågår | Azalea granskar PR #5 (spec för kärnan, CORE-01–16): https://github.com/desiboli/kundportal-ai-native-development/pull/5 före söndag |
+| Spec för kärnan är ett utkast | Första version klar, granskning pågår | Granskad av Azalea 2026-10-24 (Request changes, nio punkter). Nicklas uppdaterar, sedan godkänner Azalea |
 | Verifieringsplan saknas | Ägs av Nicklas, bygger på specarna | Första utkast vecka 6 |
 | Arbetsfördelningen är förslag | Ska bekräftas av alla fyra | Söndagsmötet |
 | Beskrivningen i den löpande PR:n (Technigo#2): https://github.com/Technigo/kundportal-ai-native-development/pull/2 saknar Azalea, Amalia och länkar | Bara Mustafa, som öppnade PR:n, kan ändra den | Mustafa uppdaterar. PR #3 (backendskelett): https://github.com/desiboli/kundportal-ai-native-development/pull/3 och PR #4 (spec, ansvar och veckostatus V5): https://github.com/desiboli/kundportal-ai-native-development/pull/4 är nu mergade, så länkarna till `docs/` fungerar |
@@ -70,7 +74,8 @@ spec för kärnan och verifieringsplan (Nicklas), backendskelett (Azalea), front
 | Vad | Ansvarig |
 | --- | --- |
 | Stackbeslut och dokumentation | Nicklas (alla beslutar) |
-| Granska spec för kärnan, PR #5 (spec för kärnan, CORE-01–16): https://github.com/desiboli/kundportal-ai-native-development/pull/5 | Azalea |
+| Uppdatera spec för kärnan efter granskningen i PR #5 (spec för kärnan, CORE-01–16): https://github.com/desiboli/kundportal-ai-native-development/pull/5 | Nicklas |
+| Godkänna PR #5 när ändringarna är gjorda, och ändra HIST-08 och HIST-10 likadant | Azalea |
 | Frontendskelett mot `/health` | Mustafa |
 | Ärendemodell och `POST`/`GET /tickets` enligt CORE (vecka 6) | Azalea |
 | Linear-ärenden per uppgift, med krav-id i beskrivningen | Alla lägger in sina |
