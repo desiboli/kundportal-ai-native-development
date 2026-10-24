@@ -1,6 +1,6 @@
 # Spec: Kärnan – skapa, lista, visa och validera ärenden (CORE)
 
-> Status: **utkast v0.2 efter Azaleas granskning (PR #5)** · Ansvarig: Nicklas (yrrving) · Granskare: Azalea (Azaalea) · Vecka 5
+> Status: **utkast v0.3** · v0.2 granskad och godkänd av Azalea (PR #5) · Ansvarig: Nicklas (yrrving) · Granskare: Azalea (Azaalea) · Vecka 5
 > Detta dokument är teamets underlag. Individuell redovisning ligger inte här.
 >
 > Bygger på [Gemensamt · API-konventioner](https://linear.app/grupp6/document/gemensamt-api-konventioner-ac15fc1ff458)
@@ -94,6 +94,8 @@ En handläggare ska kunna **registrera ett nytt kundärende**, se **en lista öv
 
 Om flera fält är fel samtidigt visas **alla** meddelanden, sammanfogade med mellanslag, i fältordningen rubrik, beskrivning, kategori, prioritet, status (beslut B7).
 
+Undantag: om något fält har fel datatyp, eller kroppen saknas eller är trasig JSON, visas **bara** "Ogiltig indata.", utan fältmeddelanden (beslut B9).
+
 ## 5. Acceptanskriterier
 
 Varje kriterium har ett id som används i tester, commits, PR:er och Linear-ärenden.
@@ -122,7 +124,7 @@ Varje kriterium har ett id som används i tester, commits, PR:er och Linear-äre
 
 **CORE-10** Givet ett okänt id, när ärendet hämtas, då svarar API:t 404 med "Ärendet finns inte." Samma gäller ett id som inte är ett heltal, t.ex. `GET /tickets/abc` (beslut B8).
 
-**CORE-17** Givet fel datatyp (t.ex. `"title": 5`), en saknad kropp eller trasig JSON, när ärendet skapas, då svarar API:t 422 med "Ogiltig indata." och inget ärende sparas.
+**CORE-17** Givet fel datatyp (t.ex. `"title": 5`), en saknad kropp eller trasig JSON, när ärendet skapas, då svarar API:t 422 med "Ogiltig indata." och inget ärende sparas. Det gäller även när ett annat fält samtidigt saknas: då visas bara "Ogiltig indata." (beslut B9).
 
 ### Gränsfall
 
@@ -172,7 +174,7 @@ Varje kriterium har ett id som används i tester, commits, PR:er och Linear-äre
 
 ## 8. Beslut och motivering
 
-Besluten är fattade av Nicklas (2026-10-24). B5, B7 och B8 är förtydligade eller tillagda efter Azaleas granskning av PR #5.
+Besluten är fattade av Nicklas (2026-10-24). B5, B7 och B8 är förtydligade eller tillagda efter Azaleas granskning av PR #5. B9 svarar på hennes fråga i godkännandet.
 
 | # | Fråga | Beslut | Skäl |
 | --- | --- | --- | --- |
@@ -184,6 +186,7 @@ Besluten är fattade av Nicklas (2026-10-24). B5, B7 och B8 är förtydligade el
 | B6 | Kunduppgifter (namn, e-post) | Inte med i v0.1 | Uppgiften kräver dem inte. Färre personuppgifter = mindre att skydda. Kan läggas till senare. |
 | B7 | Flera fel samtidigt | Visa alla, i fältordningen rubrik, beskrivning, kategori, prioritet, status | Handläggaren rättar allt på en gång. Frontend visar `detail` som det är. Fast ordning gör att testerna kan kontrollera exakt text. |
 | B8 | Id som inte är ett heltal (`GET /tickets/abc`) | 404 "Ärendet finns inte." | För handläggaren är det samma sak som ett okänt ärende, och frontend behöver bara visa ett meddelande. Alternativ: 422 med svenskt meddelande, mer tekniskt korrekt men ett fall till att hantera. Gäller även HIST-08. |
+| B9 | Fel datatyp och saknat fält samtidigt | Bara "Ogiltig indata." | Fel datatyp betyder att anropet är trasigt, vilket bara händer vid en bugg i klienten. En handläggare kan inte skriva en siffra som rubrik i formuläret. Fältmeddelandena är till för handläggaren och hjälper inte då. Ett meddelande är också enklare att bygga och testa. Alternativ: visa båda, i fältordningen. |
 
 ## Ändringar
 
@@ -191,3 +194,4 @@ Besluten är fattade av Nicklas (2026-10-24). B5, B7 och B8 är förtydligade el
 | --- | --- | --- |
 | v0.1 | 2026-10-24 | Första utkastet, CORE-01–16 |
 | v0.2 | 2026-10-24 | Efter Azaleas granskning: fast felordning (B7), CORE-17 "Ogiltig indata.", id som inte är heltal ger 404 (B8), CORE-11 gäller även beskrivning, tecken = Unicode-kodpunkter, sorteringsriktning (B5), meddelande i CORE-09, gräns mot HIST-10, vem som implementerar |
+| v0.3 | 2026-10-25 | B9: fel datatyp tillsammans med saknat fält ger bara "Ogiltig indata." (CORE-17, avsnitt 4) |
