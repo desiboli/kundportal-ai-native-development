@@ -1,6 +1,6 @@
 # Spec: Kärnan – skapa, lista, visa och validera ärenden (CORE)
 
-> Status: **utkast v0.1 för teamgranskning** · Ansvarig: Nicklas (yrrving) · Granskare: Azalea (Azaalea) · Vecka 5
+> Status: **utkast v0.2 efter Azaleas granskning (PR #5)** · Ansvarig: Nicklas (yrrving) · Granskare: Azalea (Azaalea) · Vecka 5
 > Detta dokument är teamets underlag. Individuell redovisning ligger inte här.
 >
 > Bygger på [Gemensamt · API-konventioner](https://linear.app/grupp6/document/gemensamt-api-konventioner-ac15fc1ff458)
@@ -38,6 +38,8 @@ En handläggare ska kunna **registrera ett nytt kundärende**, se **en lista öv
 | `status` | kod | – (sätts av servern) | Alltid `new` vid skapande. Får inte skickas in. |
 | `created_at` | tid | – (sätts av servern) | UTC i fast format enligt API-konventionerna |
 
+**Hur tecken räknas:** längder räknas i Unicode-kodpunkter, som Pythons `len()`. Frontend räknar likadant (t.ex. `[...text].length`) och inte med `maxlength`, som räknar UTF-16-enheter. Annars kan formuläret godkänna en rubrik som API:t avvisar.
+
 **Kategorier** (beslut B2)
 
 | Kod (API/DB) | Etikett (UI) |
@@ -61,8 +63,8 @@ En handläggare ska kunna **registrera ett nytt kundärende**, se **en lista öv
 | Metod och väg | Lyckat svar | Fel |
 | --- | --- | --- |
 | `POST /tickets` | 201, det skapade ärendet | 422 vid ogiltig indata, inget sparas |
-| `GET /tickets` | 200, lista med alla ärenden, nyaste först | – |
-| `GET /tickets/{id}` | 200, ärendet | 404 okänt ärende |
+| `GET /tickets` | 200, lista med alla ärenden, nyaste först (`created_at` fallande, sedan `id` fallande) | – |
+| `GET /tickets/{id}` | 200, ärendet | 404 okänt ärende, även när id inte är ett heltal (beslut B8) |
 
 ```json
 // POST /tickets
@@ -87,9 +89,10 @@ En handläggare ska kunna **registrera ett nytt kundärende**, se **en lista öv
 | Okänd eller saknad kategori | Välj en giltig kategori. |
 | Okänd eller saknad prioritet | Välj en giltig prioritet. |
 | Status skickas in | Status sätts automatiskt och kan inte anges när ett ärende skapas. |
-| Okänt ärende | Ärendet finns inte. |
+| Fel datatyp (t.ex. `"title": 5`), saknad kropp eller trasig JSON | Ogiltig indata. |
+| Okänt ärende eller id som inte är ett heltal | Ärendet finns inte. |
 
-Om flera fält är fel samtidigt visas **alla** meddelanden, sammanfogade med mellanslag (beslut B7).
+Om flera fält är fel samtidigt visas **alla** meddelanden, sammanfogade med mellanslag, i fältordningen rubrik, beskrivning, kategori, prioritet, status (beslut B7).
 
 ## 5. Acceptanskriterier
 
@@ -101,7 +104,7 @@ Varje kriterium har ett id som används i tester, commits, PR:er och Linear-äre
 
 **CORE-02** Givet ett skapat ärende, när applikationen startas om (ny engine och ny session mot samma databasfil), då finns ärendet kvar med samma uppgifter i `GET /tickets/{id}`.
 
-**CORE-03** Givet flera skapade ärenden, när listan hämtas, då innehåller den alla ärenden, nyaste först.
+**CORE-03** Givet flera skapade ärenden, när listan hämtas, då innehåller den alla ärenden, nyaste först (`created_at` fallande, sedan `id` fallande).
 
 **CORE-04** Givet ett skapat ärende, när det hämtas med sitt id, då svarar API:t 200 med exakt de uppgifter som sparades.
 
@@ -109,25 +112,27 @@ Varje kriterium har ett id som används i tester, commits, PR:er och Linear-äre
 
 ### Error paths
 
-**CORE-06** Givet att rubrik saknas, när ärendet skapas, då svarar API:t 422 med "Rubrik måste fyllas i." och inget ärende sparas.
+**CORE-06** Givet att rubrik saknas, när ärendet skapas, då svarar API:t 422 med "Rubrik måste fyllas i." och inget ärende sparas. (Att ingen historikpost sparas prövas i HIST-10, inte här.)
 
 **CORE-07** Givet att beskrivning saknas, när ärendet skapas, då svarar API:t 422 med "Beskrivning måste fyllas i." och inget ärende sparas.
 
 **CORE-08** Givet en okänd kategori (t.ex. `"klagomål"`), när ärendet skapas, då svarar API:t 422 med "Välj en giltig kategori." och inget ärende sparas. Samma för prioritet.
 
-**CORE-09** Givet att `status` skickas med (t.ex. `"closed"`), när ärendet skapas, då svarar API:t 422 och inget ärende sparas.
+**CORE-09** Givet att `status` skickas med (t.ex. `"closed"`), när ärendet skapas, då svarar API:t 422 med "Status sätts automatiskt och kan inte anges när ett ärende skapas." och inget ärende sparas.
 
-**CORE-10** Givet ett okänt id, när ärendet hämtas, då svarar API:t 404 med "Ärendet finns inte."
+**CORE-10** Givet ett okänt id, när ärendet hämtas, då svarar API:t 404 med "Ärendet finns inte." Samma gäller ett id som inte är ett heltal, t.ex. `GET /tickets/abc` (beslut B8).
+
+**CORE-17** Givet fel datatyp (t.ex. `"title": 5`), en saknad kropp eller trasig JSON, när ärendet skapas, då svarar API:t 422 med "Ogiltig indata." och inget ärende sparas.
 
 ### Gränsfall
 
-**CORE-11** Givet en rubrik som bara består av mellanslag (eller tabbar och radbrytningar), när ärendet skapas, då behandlas den som tom: 422 och inget sparas.
+**CORE-11** Givet en rubrik eller beskrivning som bara består av mellanslag (eller tabbar och radbrytningar), när ärendet skapas, då behandlas fältet som tomt: 422 med "Rubrik måste fyllas i." respektive "Beskrivning måste fyllas i." och inget sparas.
 
-**CORE-12** Givet en rubrik på exakt 100 tecken, när ärendet skapas, då godkänns den. Givet 101 tecken, då svaras 422 och inget sparas. (Längden räknas efter trimning.)
+**CORE-12** Givet en rubrik på exakt 100 tecken, när ärendet skapas, då godkänns den. Givet 101 tecken, då svaras 422 och inget sparas. (Längden räknas efter trimning, i Unicode-kodpunkter.)
 
 **CORE-13** Givet en beskrivning på exakt 2000 tecken, när ärendet skapas, då godkänns den. Givet 2001 tecken, då svaras 422 och inget sparas.
 
-**CORE-14** Givet en rubrik med svenska tecken och emoji (t.ex. "Åtgärd för ärende 😊"), när ärendet skapas och hämtas, då är texten oförändrad.
+**CORE-14** Givet en rubrik med svenska tecken och emoji (t.ex. "Åtgärd för ärende 😊"), när ärendet skapas och hämtas, då är texten oförändrad. Emojin 😊 räknas som ett tecken.
 
 **CORE-15** Givet att inga ärenden finns, när listan hämtas, då svarar API:t 200 med en tom lista (inte ett fel).
 
@@ -139,9 +144,13 @@ Varje kriterium har ett id som används i tester, commits, PR:er och Linear-äre
 
 | Nivå | Vad | Verktyg | Täcker | Ansvarig |
 | --- | --- | --- | --- | --- |
-| Integration (API + riktig SQLite-fil) | Skapa, lista, visa, validering, "inget sparas" | pytest + TestClient, temporär fil | CORE-01, 03–15 | Nicklas |
+| Integration (API + riktig SQLite-fil) | Skapa, lista, visa, validering, "inget sparas" | pytest + TestClient, temporär fil | CORE-01, 03–15, 17 | Nicklas |
 | Integration, omstart | Ny engine och session mot samma fil | pytest, temporär fil | CORE-02 | Nicklas |
 | Manuell | Begripliga meddelanden i UI | Checklista i `docs/verifiering.md` | CORE-16 | Nicklas |
+
+**Implementation:** Azalea (backend). **Tester:** Nicklas.
+
+**Gräns mot HIST:** CORE-testerna kontrollerar att inget *ärende* sparas vid ogiltig indata. HIST-10 kontrollerar att ingen *historikpost* sparas. Samma fall testas alltså inte två gånger.
 
 **Varför integrationsnivå:** "inget ärende sparas" (CORE-06–13) går bara att visa genom att fråga den riktiga databasen efter anropet. Ett enhetstest av valideringen ensam visar att indata avvisas, men inte att inget skrevs till databasen.
 
@@ -153,6 +162,7 @@ Varje kriterium har ett id som används i tester, commits, PR:er och Linear-äre
 | Gränsen ändras från `<= 100` till `< 100` | CORE-12 |
 | Ärendet sparas *innan* valideringen körs | CORE-06, 07, 08 |
 | `commit` tas bort (bara `flush`) | CORE-02 |
+| Den svenska felhanteraren för fel datatyp tas bort (FastAPI:s engelska standardfel går igenom) | CORE-17, CORE-16 |
 
 ## 7. Boundaries (för människor och AI-agenter)
 
@@ -162,7 +172,7 @@ Varje kriterium har ett id som används i tester, commits, PR:er och Linear-äre
 
 ## 8. Beslut och motivering
 
-Besluten är fattade av Nicklas (2026-10-24) och kan ändras efter teamets granskning.
+Besluten är fattade av Nicklas (2026-10-24). B5, B7 och B8 är förtydligade eller tillagda efter Azaleas granskning av PR #5.
 
 | # | Fråga | Beslut | Skäl |
 | --- | --- | --- | --- |
@@ -170,6 +180,14 @@ Besluten är fattade av Nicklas (2026-10-24) och kan ändras efter teamets grans
 | B2 | Kategorier | billing, delivery, technical, account, other | Vanliga i kundservice, "Övrigt" fångar resten. Påhittat, inga kunddata. |
 | B3 | Prioriteter | low, medium, high | Tre nivåer är lätta att välja mellan. Fyra ("akut") kan läggas till senare. |
 | B4 | Om `status` skickas i POST | Avvisa med 422 | Tydligare än att tyst ignorera, och stöder regeln att status bara ändras via PATCH. Alternativ: ignorera. |
-| B5 | Sortering i listan | Nyaste först (`created_at`, sedan `id`) | Handläggare vill se det senaste. `id` som andra nyckel ger stabil ordning (samma idé som HIST-11). |
+| B5 | Sortering i listan | Nyaste först (`created_at` fallande, sedan `id` fallande) | Handläggare vill se det senaste. `id` som andra nyckel ger stabil ordning (samma idé som HIST-11). |
 | B6 | Kunduppgifter (namn, e-post) | Inte med i v0.1 | Uppgiften kräver dem inte. Färre personuppgifter = mindre att skydda. Kan läggas till senare. |
-| B7 | Flera fel samtidigt | Visa alla | Handläggaren rättar allt på en gång. Frontend visar `detail` som det är. |
+| B7 | Flera fel samtidigt | Visa alla, i fältordningen rubrik, beskrivning, kategori, prioritet, status | Handläggaren rättar allt på en gång. Frontend visar `detail` som det är. Fast ordning gör att testerna kan kontrollera exakt text. |
+| B8 | Id som inte är ett heltal (`GET /tickets/abc`) | 404 "Ärendet finns inte." | För handläggaren är det samma sak som ett okänt ärende, och frontend behöver bara visa ett meddelande. Alternativ: 422 med svenskt meddelande, mer tekniskt korrekt men ett fall till att hantera. Gäller även HIST-08. |
+
+## Ändringar
+
+| Version | Datum | Ändring |
+| --- | --- | --- |
+| v0.1 | 2026-10-24 | Första utkastet, CORE-01–16 |
+| v0.2 | 2026-10-24 | Efter Azaleas granskning: fast felordning (B7), CORE-17 "Ogiltig indata.", id som inte är heltal ger 404 (B8), CORE-11 gäller även beskrivning, tecken = Unicode-kodpunkter, sorteringsriktning (B5), meddelande i CORE-09, gräns mot HIST-10, vem som implementerar |
