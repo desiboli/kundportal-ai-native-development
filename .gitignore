@@ -17,3 +17,6 @@ dist/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Claude Code, personliga inställningar
+.claude/settings.local.json
