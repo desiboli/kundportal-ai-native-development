@@ -64,6 +64,11 @@ spec för kärnan och verifieringsplan (Nicklas), backendskelett (Azalea), front
 
 **Väntar:** Nicklas granskning av PR #9 (HIST-spec v0.5, HIST-08 och HIST-10 efter CORE v0.2): https://github.com/desiboli/kundportal-ai-native-development/pull/9.
 
+- Verktygsprov 2026-10-24–25 (Azalea, med AI-stöd): Hypothesis och Schemathesis fungerar med
+  projektets versioner (pytest 9.1.1, FastAPI 0.159.1). Provkörningen mot en prototyp med
+  CORE-reglerna gav fyra fynd, bland annat att ogiltiga tecken i kroppen ger 400 på engelska.
+  Publicerade som kommentar på PR #5 (spec för kärnan, CORE-01–16): https://github.com/desiboli/kundportal-ai-native-development/pull/5#issuecomment-6394982815
+
 ## Osäkert eller ofärdigt
 
 | Vad | Varför | Plan |
@@ -87,6 +92,7 @@ spec för kärnan och verifieringsplan (Nicklas), backendskelett (Azalea), front
 | Frontendskelett mot `/health` | Mustafa |
 | Ärendemodell och `POST`/`GET /tickets` enligt CORE (vecka 6) | Azalea |
 | Linear-ärenden per uppgift, med krav-id i beskrivningen | Alla lägger in sina |
+| Ta ställning till fynden om CORE-11, CORE-14 och CORE-17 i kommentaren på PR #5: https://github.com/desiboli/kundportal-ai-native-development/pull/5#issuecomment-6394982815 | Nicklas |
 | Uppdatera beskrivningen i den löpande PR:n med alla fyra och länkar | Mustafa |
 | Svara på radkommentarerna i PR #7 (Amalia tar tidslinje och felmeddelanden i UI, HIST-05 och HIST-14): https://github.com/desiboli/kundportal-ai-native-development/pull/7 så att den kan mergas (alla konversationer måste vara lösta) | Amalia |
 | Granska PR #9 (HIST-spec v0.5, HIST-08 och HIST-10 efter CORE v0.2): https://github.com/desiboli/kundportal-ai-native-development/pull/9 | Nicklas |
