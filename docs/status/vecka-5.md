@@ -1,7 +1,6 @@
 # Veckostatus vecka 5: Projektstart och specifikation
 
-> Utkast, senast uppdaterat söndag 2026-10-25 morgon (Azalea). Kompletteras av teamet efter
-> mötet söndag 2026-10-25.
+> Senast uppdaterat söndag 2026-10-25 efter teammötet (Azalea).
 > Jämför med veckans förväntningar i Disco.
 
 ## Planerat
@@ -27,7 +26,7 @@ spec för kärnan och verifieringsplan (Nicklas), backendskelett (Azalea), front
 | Linear-projekt, milstolpar och ärendemallar. Beskrivningen av milstolpe 02 rättad 2026-10-23 | Mustafa | [Linear: Kundserviceportalen](https://linear.app/grupp6/project/kundserviceportalen-be4a4840b5ef) |
 | Fält för krav-id (CORE-xx, HIST-xx) i alla fyra ärendemallarna, och en rad i Verification om testet faller av rätt anledning | Nicklas | Linear, ärendemallarna |
 | Spec v0.3: statuslogik och ärendehistorik, acceptanskriterier HIST-01–14, teststrategi | Azalea | [docs/specs/SPEC-arendehistorik.md](../specs/SPEC-arendehistorik.md), PR #4 (spec, ansvar och veckostatus V5): https://github.com/desiboli/kundportal-ai-native-development/pull/4 (godkänd av Mustafa, mergad 2026-10-23) |
-| Arbetsfördelning | Alla (förslag) | [docs/ansvar-och-granskning.md](../ansvar-och-granskning.md), i samma PR #4 (spec, ansvar och veckostatus V5): https://github.com/desiboli/kundportal-ai-native-development/pull/4 |
+| Arbetsfördelning, bekräftad av alla fyra på mötet 2026-10-25 | Alla | [docs/ansvar-och-granskning.md](../ansvar-och-granskning.md), i samma PR #4 (spec, ansvar och veckostatus V5): https://github.com/desiboli/kundportal-ai-native-development/pull/4 |
 | Backendskelett: FastAPI, SQLite, `GET /health`, körinstruktioner i README, port 8010 | Azalea | PR #3 (backendskelett: FastAPI, SQLite och /health): https://github.com/desiboli/kundportal-ai-native-development/pull/3 (godkänd av Mustafa, mergad 2026-10-23) |
 | Spec för kärnan v0.2: CORE-01–17, felmeddelanden, gränsfall, mutationer, beslut B1–B8 | Nicklas | PR #5 (spec för kärnan, CORE-01–16): https://github.com/desiboli/kundportal-ai-native-development/pull/5 (granskad av Azalea, alla nio punkter åtgärdade i v0.2, godkänd och mergad 2026-10-24) |
 | Amalia har valt sin del: tidslinjen (HIST-05) och UI-delen av HIST-14 | Amalia | PR #7 (Amalia tar tidslinje och felmeddelanden i UI, HIST-05 och HIST-14): https://github.com/desiboli/kundportal-ai-native-development/pull/7 (godkänd av Azalea) |
@@ -37,6 +36,14 @@ spec för kärnan och verifieringsplan (Nicklas), backendskelett (Azalea), front
 | Frontend-skelett: React, Vite, TypeScript, Tailwind och shadcn/ui under `frontend/` (pnpm) | Mustafa | PR #11 (frontend-skelett med React, Vite och TypeScript): https://github.com/desiboli/kundportal-ai-native-development/pull/11 (godkänd och mergad av Amalia 2026-10-25) |
 | Feedback på specen och mallarna | Nicklas, Amalia | Slack, inarbetat i spec v0.3 |
 | Svar på feedbacken och sammanfattning av spec v0.3 till teamet | Azalea | Slack 2026-10-23 |
+
+## Beslut på teammötet 2026-10-25
+
+| Beslut | Innehåll |
+| --- | --- |
+| **Stack** | Vi kör på det vi har: backend Python 3.11 + FastAPI + SQLAlchemy + SQLite (port 8010), frontend React + Vite + TypeScript + Tailwind CSS v4 + shadcn/ui, pakethanterare pnpm. Tester: pytest i backend, vitest i frontend |
+| **Ansvar** | Bekräftat av alla fyra enligt `docs/ansvar-och-granskning.md` |
+| **AI-arbetssätt** | En gemensam `AGENTS.md` och CI på varje PR som grund (Azalea). Därefter en skill per område med en ägare |
 
 ## Verifierat
 
@@ -75,10 +82,9 @@ spec för kärnan och verifieringsplan (Nicklas), backendskelett (Azalea), front
 
 | Vad | Varför | Plan |
 | --- | --- | --- |
-| Stacken är inte beslutad | Mustafa föreslog TypeScript rakt igenom som alternativ till FastAPI | Beslutas söndag, Nicklas dokumenterar i `docs/decisions/` |
+| Stackbeslutet är inte nedskrivet i `docs/decisions/` än | Beslutet togs på mötet | Nicklas dokumenterar jämförelsen och beslutet |
 | Frontenden anropar inte backenden än | Skelettet i PR #11 (frontend-skelett med React, Vite och TypeScript): https://github.com/desiboli/kundportal-ai-native-development/pull/11 visar en startsida men hämtar inte `/health`, och Vite saknar proxy till port 8010 | Proxy till `http://localhost:8010` och en sida som visar svaret från `/health`. Frontendkommandon i README |
 | Verifieringsplan saknas | Ägs av Nicklas, bygger på specarna | Första utkast vecka 6 |
-| Arbetsfördelningen är förslag | Ska bekräftas av alla fyra. Amalia har valt sin del | Söndagsmötet |
 | Beskrivningen i den löpande PR:n (Technigo#2): https://github.com/Technigo/kundportal-ai-native-development/pull/2 saknar Azalea, Amalia och länkar | Bara Mustafa, som öppnade PR:n, kan ändra den | Mustafa uppdaterar. PR #3 (backendskelett): https://github.com/desiboli/kundportal-ai-native-development/pull/3 och PR #4 (spec, ansvar och veckostatus V5): https://github.com/desiboli/kundportal-ai-native-development/pull/4 är nu mergade, så länkarna till `docs/` fungerar |
 | Backendskelettet mergades utan att Nicklas hann granska | Mustafa godkände först | Nicklas kan granska i efterhand med kommentarer i PR #3 (backendskelett: FastAPI, SQLite och /health): https://github.com/desiboli/kundportal-ai-native-development/pull/3 |
 | Inga Linear-ärenden per uppgift än | Strukturen och mallarna finns, ärendena inte | Skapas efter söndagsmötet |
@@ -87,7 +93,8 @@ spec för kärnan och verifieringsplan (Nicklas), backendskelett (Azalea), front
 
 | Vad | Ansvarig |
 | --- | --- |
-| Stackbeslut och dokumentation | Nicklas (alla beslutar) |
+| Dokumentera stackbeslutet i `docs/decisions/` | Nicklas |
+| `AGENTS.md` med teamets regler och CI (pytest på varje PR) | Azalea |
 | ~~Uppdatera spec för kärnan efter granskningen~~ klart i v0.2, PR #5 (spec för kärnan, CORE-01–16): https://github.com/desiboli/kundportal-ai-native-development/pull/5 | Nicklas |
 | ~~Godkänna PR #5~~ godkänd och mergad 2026-10-24: PR #5 (spec för kärnan, CORE-01–16): https://github.com/desiboli/kundportal-ai-native-development/pull/5. HIST-08 och HIST-10 ändrade i PR #9 (HIST-spec v0.5, HIST-08 och HIST-10 efter CORE v0.2): https://github.com/desiboli/kundportal-ai-native-development/pull/9 | Azalea |
 | Koppla frontend till `/health` (proxy till 8010) och frontendkommandon i README | Mustafa |
