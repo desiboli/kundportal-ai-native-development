@@ -64,9 +64,21 @@ Ingen `status`-kolumn. Aktuell status är senaste historikposten.
 
 - Tjänstelagret blir testets fokus. Fel injiceras mellan statusuppdatering och
   historikinsättning för att visa rollback (HIST-09).
-- När historikposten inte kan sparas svarar API:t 500 med "Statusen kunde inte ändras.
-  Försök igen." Tjänsten gör `rollback`, så sessionen kan användas igen och nästa
-  statusändring lyckas.
+- När historikposten inte kan sparas gör tjänsten `rollback`, så sessionen kan användas
+  igen och nästa statusändring lyckas. API:t svarar **503** med "Statusen kunde inte
+  ändras. Försök igen."
+
+  **Beslut om statuskoden (Azalea, 2026-10-25): 503 i stället för 500.**
+
+  | | 500 Internal Server Error | 503 Service Unavailable |
+  |---|---|---|
+  | För | En generell hanterare för alla oväntade fel | `/health` använder redan 503 när databasen inte går att nå, så samma sorts fel får samma kod. "Försök igen" passar ett tillfälligt fel. Frontend kan visa ett försök-igen-besked utan att tolka texten |
+  | Emot | Säger "något gick fel hos oss" och ger ingen ledning om att ett nytt försök kan lyckas | Kräver en egen hanterare i tjänsten/routern, skild från den generella 500-hanteraren |
+
+  Valet följer av beslutet ovan: eftersom atomiciteten ligger i tjänstelagret (alternativ A)
+  kan tjänsten fånga felet, rulla tillbaka och svara med en bestämd kod. Med en trigger
+  (alternativ B) hade felet kommit från databasen och varit svårare att skilja från andra
+  fel. Kontrolleras i HIST-09-testerna (statuskod 503, oförändrad status, nästa byte lyckas).
 - **Kvarstående risk:** en kodväg som kringgår tjänsten fångas inte av trigger. Kontrollen
   är invarianttestet och granskning, inte databasen.
 - **Test som motbevisar beslutet:** om mutation (historikskrivningen avstängd, eller

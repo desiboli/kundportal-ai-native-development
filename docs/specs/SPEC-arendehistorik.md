@@ -20,7 +20,7 @@
 >
 > **Ändrat i v0.7 (2026-10-25), efter körningarna av testinstruktion v1:** exakta meddelanden
 > för ogiltig status (HIST-06) och samma status (HIST-07), svaret när historiken inte kan
-> sparas (HIST-09, 500), vad omstart betyder i testet (HIST-04), vem som äger testerna för
+> sparas (HIST-09, 503), vad omstart betyder i testet (HIST-04), vem som äger testerna för
 > HIST-07, ADR-001 i `docs/decisions/`. Statusbytet hör till milstolpe 03, eftersom
 > examinationen räknar "ändra status" till kärnan. Historiken är tilläggsfunktionen (04).
 
@@ -40,6 +40,12 @@ gemensamma dokumentet, och ändringar görs där först.
 Handläggare ska kunna **ändra status på ett ärende** och se **vad som hänt med ärendet och
 när**. Varje gång ett ärende skapas eller byter status sparas en oföränderlig historikpost.
 Historiken visas som en tidslinje i ärendets detaljvy.
+
+**Kärna och tilläggsfunktion.** Statusbytet (`PATCH /tickets/{id}/status` och statusreglerna,
+HIST-06, 07, 08, 13) hör till kärnan, eftersom uppgiften kräver "ändra status på ett ärende"
+(milstolpe 03). **Den kompletterande funktionen är ärendehistoriken** (HIST-01–05, 09–12, 14,
+milstolpe 04). Båda ligger i samma spec eftersom historiken skrivs i samma transaktion som
+statusbytet.
 
 **Varför just historik?** Funktionen berör alla lager (databas, tjänstelogik, API, UI) och
 har en verklig teknisk risk: statusändringen och historikposten måste lyckas eller
@@ -143,7 +149,7 @@ om `event_type = 'created'`. Poster ändras eller tas aldrig bort av applikation
 | Metod och väg                 | Lyckat svar                                                     | Fel                                                                        |
 | ------------------------------ | --------------------------------------------------------------- | -------------------------------------------------------------------------- |
 | `POST /tickets` (utökas)    | 201, ärendet. Skapar en `created`-post.                      | 422 vid ogiltig indata, då skapas varken ärende eller post               |
-| `PATCH /tickets/{id}/status` | 200, ärendet med ny status. Skapar en `status_changed`-post. | 404 okänt ärende (även id som inte är heltal) · 422 ogiltig status · 409 samma status som nuvarande · 500 om historikposten inte kan sparas (inget ändras) |
+| `PATCH /tickets/{id}/status` | 200, ärendet med ny status. Skapar en `status_changed`-post. | 404 okänt ärende (även id som inte är heltal) · 422 ogiltig status · 409 samma status som nuvarande · 503 om historikposten inte kan sparas (inget ändras) |
 | `GET /tickets/{id}/history`  | 200, lista äldst först                                        | 404 okänt ärende (även id som inte är heltal)                            |
 
 **Anrop och svar**
@@ -173,7 +179,7 @@ ovan (krävs för HIST-06 och HIST-14).
 | Okänd eller saknad status (t.ex. `"klar"`) | 422 | Välj en giltig status. |
 | Fel datatyp (t.ex. `{"status": 5}`), saknad kropp eller trasig JSON | 422 | Ogiltig indata. |
 | Samma status som nuvarande | 409 | Ärendet har redan den statusen. |
-| Historikposten kunde inte sparas (allt rullas tillbaka) | 500 | Statusen kunde inte ändras. Försök igen. |
+| Historikposten kunde inte sparas (allt rullas tillbaka) | 503 | Statusen kunde inte ändras. Försök igen. |
 
 ## 6. Acceptanskriterier
 
@@ -215,7 +221,8 @@ HIST-06, 07 och 13 är statusregler, de övriga gäller historiken.
   (samma beslut som B8 i CORE-specen).
 - **HIST-09** Givet att skrivningen av historikposten misslyckas, när status ändras, då
   rullas statusändringen tillbaka och ärendet behåller sin gamla status (atomicitet).
-  API:t svarar 500 med "Statusen kunde inte ändras. Försök igen." utan tekniska detaljer.
+  API:t svarar 503 med "Statusen kunde inte ändras. Försök igen." utan tekniska detaljer
+  (samma statuskod som `/health` när databasen inte går att nå, se ADR-001).
   Statusen är oförändrad även när databasfilen läses med en ny engine, och nästa
   statusändring på samma ärende lyckas (sessionen lämnas inte trasig).
 - **HIST-10** Givet att ärendet inte kan skapas (t.ex. tom rubrik), när `POST` körs, då
