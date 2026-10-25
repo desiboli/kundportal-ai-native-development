@@ -15,6 +15,7 @@ historiken. Grupparbete i kursen AI Native Development (Grupp 6).
 | Specar | Kärnan (CORE-id) och statuslogik och historik (HIST-id) | `docs/specs/` |
 | Ansvar | Vem äger och granskar vad | `docs/ansvar-och-granskning.md` |
 | Veckostatus | En fil per vecka | `docs/status/` |
+| Gemensamma regler | API-konventioner, arkitektur, teststrategi | `docs/api-konventioner.md`, `docs/arkitektur.md`, `docs/teststrategi.md` |
 
 ## Kommandon
 
@@ -42,6 +43,8 @@ Frontend: se `frontend/README.md` (pnpm). Backend körs på **port 8010**, inte 
 - **PR-referenser** skrivs med hel länk och beskrivning, t.ex.
   `PR #3 (backendskelett): https://github.com/desiboli/kundportal-ai-native-development/pull/3`.
 - **Påhittade uppgifter**, aldrig riktiga kunduppgifter.
+- **Repot är huvudversion.** Gemensamma dokument ändras bara i repot, via PR. Linear används
+  för planering (ärenden, milstolpar) och länkar hit.
 
 ## Fråga först
 
