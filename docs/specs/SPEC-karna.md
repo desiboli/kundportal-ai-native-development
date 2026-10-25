@@ -1,9 +1,9 @@
 # Spec: Kärnan – skapa, lista, visa och validera ärenden (CORE)
 
-> Status: **utkast v0.3** · v0.2 granskad och godkänd av Azalea (PR #5) · Ansvarig: Nicklas (yrrving) · Granskare: Azalea (Azaalea) · Vecka 5
+> Status: **utkast v0.4** · v0.2 granskad och godkänd av Azalea (PR #5) · Ansvarig: Nicklas (yrrving) · Granskare: Azalea (Azaalea) · Vecka 5
 > Detta dokument är teamets underlag. Individuell redovisning ligger inte här.
 >
-> Bygger på [Gemensamt · API-konventioner](https://linear.app/grupp6/document/gemensamt-api-konventioner-ac15fc1ff458)
+> Bygger på [API-konventioner](../api-konventioner.md)
 > (statuskoder, felformat, tider, språk). Vid skillnad gäller API-konventionerna.
 > Statuslogik och historik finns i [SPEC-arendehistorik.md](SPEC-arendehistorik.md) (HIST-id).
 
@@ -112,7 +112,7 @@ Varje kriterium har ett id som används i tester, commits, PR:er och Linear-äre
 
 **CORE-04** Givet ett skapat ärende, när det hämtas med sitt id, då svarar API:t 200 med exakt de uppgifter som sparades.
 
-**CORE-05** Givet en rubrik med mellanslag före och efter, när ärendet skapas, då sparas rubriken utan de inledande och avslutande mellanslagen.
+**CORE-05** Givet en rubrik eller beskrivning med blanktecken eller nollbreddstecken före och efter, när ärendet skapas, då sparas fältet utan dem (trimning enligt B10). Tecken inne i texten behålls (beslut B12).
 
 ### Error paths
 
@@ -128,6 +128,8 @@ Varje kriterium har ett id som används i tester, commits, PR:er och Linear-äre
 
 **CORE-17** Givet fel datatyp (t.ex. `"title": 5`), en saknad kropp, trasig JSON eller en kropp med ogiltig UTF-8, när ärendet skapas, då svarar API:t 422 med "Ogiltig indata." och inget ärende sparas. Det gäller även när ett annat fält samtidigt saknas: då visas bara "Ogiltig indata." (beslut B9).
 
+**CORE-18** Givet att flera fält är fel samtidigt (t.ex. rubrik saknas och beskrivningen är för lång), när ärendet skapas, då svarar API:t 422 med alla meddelanden, sammanfogade med mellanslag i fältordningen rubrik, beskrivning, kategori, prioritet, status (beslut B7), och inget ärende sparas. Undantag: fel datatyp ger bara "Ogiltig indata." (CORE-17).
+
 ### Gränsfall
 
 **CORE-11** Givet en rubrik eller beskrivning som bara består av blanktecken eller osynliga tecken (t.ex. mellanslag, tabbar, radbrytningar eller nollbreddsmellanslag U+200B), när ärendet skapas, då behandlas fältet som tomt: 422 med "Rubrik måste fyllas i." respektive "Beskrivning måste fyllas i." och inget sparas.
@@ -136,7 +138,7 @@ Varje kriterium har ett id som används i tester, commits, PR:er och Linear-äre
 
 **CORE-13** Givet en beskrivning på exakt 2000 tecken, när ärendet skapas, då godkänns den. Givet 2001 tecken, då svaras 422 och inget sparas.
 
-**CORE-14** Givet en rubrik med svenska tecken och emoji (t.ex. "Åtgärd för ärende 😊"), när ärendet skapas och hämtas, då är texten oförändrad. Emojin 😊 räknas som ett tecken. Sammansatta emoji räknas som sina kodpunkter (🇸🇪 = 2, 👩‍💻 = 3), så en rubrik på 98 tecken + 👩‍💻 är 101 och avvisas.
+**CORE-14** Givet en rubrik med svenska tecken och emoji (t.ex. "Åtgärd för ärende 😊"), när ärendet skapas och hämtas, då är texten oförändrad. Den görs inte om (ingen Unicode-normalisering, beslut B12). Emojin 😊 räknas som ett tecken. Sammansatta emoji räknas som sina kodpunkter (🇸🇪 = 2, 👩‍💻 = 3), så en rubrik på 98 tecken + 👩‍💻 är 101 och avvisas.
 
 **CORE-15** Givet att inga ärenden finns, när listan hämtas, då svarar API:t 200 med en tom lista (inte ett fel).
 
@@ -146,9 +148,11 @@ Varje kriterium har ett id som används i tester, commits, PR:er och Linear-äre
 
 ## 6. Testningsstrategi (kärnan)
 
+Teamets gemensamma teststrategi finns i [teststrategi.md](../teststrategi.md). Det här avsnittet är kärnans del av den. Vid skillnad gäller teststrategin.
+
 | Nivå | Vad | Verktyg | Täcker | Ansvarig |
 | --- | --- | --- | --- | --- |
-| Integration (API + riktig SQLite-fil) | Skapa, lista, visa, validering, "inget sparas" | pytest + TestClient, temporär fil | CORE-01, 03–15, 17 | Nicklas |
+| Integration (API + riktig SQLite-fil) | Skapa, lista, visa, validering, "inget sparas" | pytest + TestClient, temporär fil | CORE-01, 03–15, 17, 18 | Nicklas |
 | Integration, omstart | Ny engine och session mot samma fil | pytest, temporär fil | CORE-02 | Nicklas |
 | Manuell | Begripliga meddelanden i UI | Checklista i `docs/verifiering.md` | CORE-16 | Nicklas |
 
@@ -166,6 +170,7 @@ Varje kriterium har ett id som används i tester, commits, PR:er och Linear-äre
 | Trimningen tar bara bort vanliga blanktecken, inte nollbreddstecken (`"\u200b"` räknas som giltig rubrik) | CORE-11 |
 | Gränsen ändras från `<= 100` till `< 100` | CORE-12 |
 | Ärendet sparas *innan* valideringen körs | CORE-06, 07, 08 |
+| Valideringen slutar vid första felet (bara ett meddelande) | CORE-18 |
 | `commit` tas bort (bara `flush`) | CORE-02 |
 | Den svenska felhanteraren för fel datatyp tas bort (FastAPI:s engelska standardfel går igenom) | CORE-17, CORE-16 |
 | Felhanteraren för ogiltig UTF-8 tas bort (Starlettes 400 på engelska går igenom) | CORE-17, CORE-16 |
@@ -178,7 +183,7 @@ Varje kriterium har ett id som används i tester, commits, PR:er och Linear-äre
 
 ## 8. Beslut och motivering
 
-Besluten är fattade av Nicklas (2026-10-24). B5, B7 och B8 är förtydligade eller tillagda efter Azaleas granskning av PR #5. B9 svarar på hennes fråga i godkännandet. B10 och B11, och ogiltig UTF-8 i CORE-17, kommer från hennes provkörning med Hypothesis och Schemathesis (kommentar i PR #5).
+Besluten är fattade av Nicklas (2026-10-24). B5, B7 och B8 är förtydligade eller tillagda efter Azaleas granskning av PR #5. B9 svarar på hennes fråga i godkännandet. B10 och B11, och ogiltig UTF-8 i CORE-17, kommer från hennes provkörning med Hypothesis och Schemathesis (kommentar i PR #5). B12 och CORE-18 kommer från frågorna när testinstruktionen v1 och v2-nicklas kördes på CORE-11–14 (2026-10-25).
 
 | # | Fråga | Beslut | Skäl |
 | --- | --- | --- | --- |
@@ -193,6 +198,7 @@ Besluten är fattade av Nicklas (2026-10-24). B5, B7 och B8 är förtydligade el
 | B9 | Fel datatyp och saknat fält samtidigt | Bara "Ogiltig indata." | Fel datatyp betyder att anropet är trasigt, vilket bara händer vid en bugg i klienten. En handläggare kan inte skriva en siffra som rubrik i formuläret. Fältmeddelandena är till för handläggaren och hjälper inte då. Ett meddelande är också enklare att bygga och testa. Alternativ: visa båda, i fältordningen. |
 | B10 | Vad räknas som tomt | Blanktecken enligt `str.strip()` + nollbreddstecken (U+200B, U+200C, U+200D, U+2060, U+FEFF) | En rubrik som ser tom ut för handläggaren ska behandlas som tom. `strip()` ensam släpper igenom nollbreddstecken. Listan är kort och går att testa tecken för tecken. Alternativ: alla osynliga Unicode-tecken (svårare att avgränsa och testa). |
 | B11 | Sammansatta emoji | Räknas som sina kodpunkter (🇸🇪 = 2, 👩‍💻 = 3) | Samma räkning i backend (`len`) och frontend (`[...text].length`), så de är alltid överens. Att räkna det man ser som ett tecken (grafemkluster) kräver extra bibliotek på båda sidor, för ett ovanligt fall. Alternativ: grafemkluster. |
+| B12 | Vad som sparas | Rubrik och beskrivning sparas trimmade enligt B10, bara i ändarna. Tecken inne i texten, även nollbreddstecken, behålls och räknas. Texten görs inte om (ingen Unicode-normalisering). | Det som räknas mot gränsen är samma text som sparas, så en rubrik kan inte godkännas som 100 tecken och sparas som 101. Nollbreddstecken inne i texten håller ihop sammansatta emoji (👩‍💻), så de får inte tas bort. CORE-14 kräver att texten är oförändrad, och tangentbord skickar nästan alltid redan sammansatta tecken (NFC). Alternativ: normalisera till NFC (ändrar det användaren skrev). |
 
 ## Ändringar
 
@@ -201,3 +207,4 @@ Besluten är fattade av Nicklas (2026-10-24). B5, B7 och B8 är förtydligade el
 | v0.1 | 2026-10-24 | Första utkastet, CORE-01–16 |
 | v0.2 | 2026-10-24 | Efter Azaleas granskning: fast felordning (B7), CORE-17 "Ogiltig indata.", id som inte är heltal ger 404 (B8), CORE-11 gäller även beskrivning, tecken = Unicode-kodpunkter, sorteringsriktning (B5), meddelande i CORE-09, gräns mot HIST-10, vem som implementerar |
 | v0.3 | 2026-10-25 | B9: fel datatyp tillsammans med saknat fält ger bara "Ogiltig indata." (CORE-17, avsnitt 4). Efter Azaleas provkörning (kommentar i PR #5): ogiltig UTF-8 i CORE-17, B10 vad som räknas som tomt (CORE-11), B11 sammansatta emoji (CORE-14), två nya mutationer |
+| v0.4 | 2026-10-25 | Länkar till `docs/api-konventioner.md` och `docs/teststrategi.md` i repot i stället för Linear. Efter körningarna av testinstruktionen: B12 vad som sparas (trimning bara i ändarna, ingen normalisering), CORE-05 gäller båda fälten, CORE-18 flera fel samtidigt (B7 fick ett krav-id), en ny mutation |
