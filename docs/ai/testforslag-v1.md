@@ -23,7 +23,7 @@ granskningen sker på förslaget och inte på färdig kod.
    - minst ett **happy path**-fall,
    - de **error paths** som kravet nämner,
    - relevanta **gränsfall**.
-3. Välj testnivå enligt Teststrategin (avsnitt 6 i CORE-specen, avsnitt 10 i HIST-specen)
+3. Välj testnivå enligt [Teststrategin](../teststrategi.md) (avsnitt 2, Testnivåer)
    och säg varför.
 4. Ange för varje test **vilken mutation** i koden som ska få testet att falla.
 5. Skriv **inte** testkoden än. Förslaget granskas först.
@@ -42,6 +42,9 @@ Efter tabellen: en kort lista med **frågor** om något i specen är otydligt.
 
 - Hitta inte på krav. Allt som testas ska gå att peka på i specen.
 - Ändra inte specen. Är den otydlig: skriv en fråga.
+- Håll dig till den spec som kravet står i. Där CORE och HIST gränsar till varandra
+  (t.ex. CORE-06 och HIST-10) föreslås fallet bara för det krav som äger beteendet.
+  Nämn det andra kravet i en fråga i stället för att föreslå samma test två gånger.
 - Förväntade felmeddelanden ska vara **exakt** de som står i specen.
 - Bara påhittade uppgifter.
 
