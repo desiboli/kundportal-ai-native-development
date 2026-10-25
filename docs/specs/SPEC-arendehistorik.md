@@ -18,16 +18,16 @@
 > **Ändrat i v0.6 (2026-10-25), efter teammötet:** stacken och ansvarstabellen är beslutade.
 > HIST-06 säger att fel datatyp ger "Ogiltig indata." (samma som B9 i CORE).
 
-**Gemensamma dokument (huvudversioner) i Linear.** Delar av specen gäller hela teamet och
+**Gemensamma dokument (huvudversioner) i repot.** Delar av specen gäller hela teamet och
 har därför fått egna dokument. Specen är fortfarande komplett, men vid skillnad gäller det
 gemensamma dokumentet, och ändringar görs där först.
 
 | Dokument | Huvudversion för | Avsnitt här |
 | --- | --- | --- |
-| [Gemensamt · API-konventioner](https://linear.app/grupp6/document/gemensamt-api-konventioner-ac15fc1ff458) | Statuskoder, felformat, tider, språk, endpoints, OpenAPI-kontraktet | 3, 5 |
-| [Gemensamt · Ansvar och granskning](https://linear.app/grupp6/document/gemensamt-ansvar-och-granskning-fa06c24358e0) | Vem äger och granskar vad | 2 |
-| [Gemensamt · Arkitektur och projektstruktur](https://linear.app/grupp6/document/gemensamt-arkitektur-och-projektstruktur-4384f2744364) | Stack, lager, regler per lager, mappar | 3, 7, 9 |
-| [Gemensamt · Teststrategi och verifiering](https://linear.app/grupp6/document/gemensamt-teststrategi-och-verifiering-0d1ebfb8cadd) | Testnivåer, mutationsprövning, testinstruktion | 10 |
+| [API-konventioner](../api-konventioner.md) | Statuskoder, felformat, tider, språk, endpoints, OpenAPI-kontraktet | 3, 5 |
+| [Ansvar och granskning](../ansvar-och-granskning.md) | Vem äger och granskar vad | 2 |
+| [Arkitektur och projektstruktur](../arkitektur.md) | Stack, lager, regler per lager, mappar | 3, 7, 9 |
+| [Teststrategi och verifiering](../teststrategi.md) | Testnivåer, mutationsprövning, testinstruktion | 10 |
 
 ## 1. Objective
 
