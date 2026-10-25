@@ -38,7 +38,9 @@ En handläggare ska kunna **registrera ett nytt kundärende**, se **en lista öv
 | `status` | kod | – (sätts av servern) | Alltid `new` vid skapande. Får inte skickas in. |
 | `created_at` | tid | – (sätts av servern) | UTC i fast format enligt API-konventionerna |
 
-**Hur tecken räknas:** längder räknas i Unicode-kodpunkter, som Pythons `len()`. Frontend räknar likadant (t.ex. `[...text].length`) och inte med `maxlength`, som räknar UTF-16-enheter. Annars kan formuläret godkänna en rubrik som API:t avvisar.
+**Hur tecken räknas:** längder räknas i Unicode-kodpunkter, som Pythons `len()`. Frontend räknar likadant (t.ex. `[...text].length`) och inte med `maxlength`, som räknar UTF-16-enheter. Annars kan formuläret godkänna en rubrik som API:t avvisar. Sammansatta emoji räknas som de kodpunkter de består av: 😊 = 1, 🇸🇪 = 2, 👩‍💻 = 3 (beslut B11).
+
+**Vad som räknas som tomt:** vid trimning tas blanktecken bort (allt som Pythons `str.strip()` tar bort, t.ex. mellanslag, tabb, radbrytning, hårt mellanslag) och dessutom osynliga tecken med noll bredd: U+200B, U+200C, U+200D, U+2060 och U+FEFF. Ett fält som bara består av sådana tecken är tomt (beslut B10).
 
 **Kategorier** (beslut B2)
 
@@ -89,7 +91,7 @@ En handläggare ska kunna **registrera ett nytt kundärende**, se **en lista öv
 | Okänd eller saknad kategori | Välj en giltig kategori. |
 | Okänd eller saknad prioritet | Välj en giltig prioritet. |
 | Status skickas in | Status sätts automatiskt och kan inte anges när ett ärende skapas. |
-| Fel datatyp (t.ex. `"title": 5`), saknad kropp eller trasig JSON | Ogiltig indata. |
+| Fel datatyp (t.ex. `"title": 5`), saknad kropp, trasig JSON eller ogiltiga tecken (ogiltig UTF-8) | Ogiltig indata. |
 | Okänt ärende eller id som inte är ett heltal | Ärendet finns inte. |
 
 Om flera fält är fel samtidigt visas **alla** meddelanden, sammanfogade med mellanslag, i fältordningen rubrik, beskrivning, kategori, prioritet, status (beslut B7).
@@ -124,17 +126,17 @@ Varje kriterium har ett id som används i tester, commits, PR:er och Linear-äre
 
 **CORE-10** Givet ett okänt id, när ärendet hämtas, då svarar API:t 404 med "Ärendet finns inte." Samma gäller ett id som inte är ett heltal, t.ex. `GET /tickets/abc` (beslut B8).
 
-**CORE-17** Givet fel datatyp (t.ex. `"title": 5`), en saknad kropp eller trasig JSON, när ärendet skapas, då svarar API:t 422 med "Ogiltig indata." och inget ärende sparas. Det gäller även när ett annat fält samtidigt saknas: då visas bara "Ogiltig indata." (beslut B9).
+**CORE-17** Givet fel datatyp (t.ex. `"title": 5`), en saknad kropp, trasig JSON eller en kropp med ogiltig UTF-8, när ärendet skapas, då svarar API:t 422 med "Ogiltig indata." och inget ärende sparas. Det gäller även när ett annat fält samtidigt saknas: då visas bara "Ogiltig indata." (beslut B9).
 
 ### Gränsfall
 
-**CORE-11** Givet en rubrik eller beskrivning som bara består av mellanslag (eller tabbar och radbrytningar), när ärendet skapas, då behandlas fältet som tomt: 422 med "Rubrik måste fyllas i." respektive "Beskrivning måste fyllas i." och inget sparas.
+**CORE-11** Givet en rubrik eller beskrivning som bara består av blanktecken eller osynliga tecken (t.ex. mellanslag, tabbar, radbrytningar eller nollbreddsmellanslag U+200B), när ärendet skapas, då behandlas fältet som tomt: 422 med "Rubrik måste fyllas i." respektive "Beskrivning måste fyllas i." och inget sparas.
 
 **CORE-12** Givet en rubrik på exakt 100 tecken, när ärendet skapas, då godkänns den. Givet 101 tecken, då svaras 422 och inget sparas. (Längden räknas efter trimning, i Unicode-kodpunkter.)
 
 **CORE-13** Givet en beskrivning på exakt 2000 tecken, när ärendet skapas, då godkänns den. Givet 2001 tecken, då svaras 422 och inget sparas.
 
-**CORE-14** Givet en rubrik med svenska tecken och emoji (t.ex. "Åtgärd för ärende 😊"), när ärendet skapas och hämtas, då är texten oförändrad. Emojin 😊 räknas som ett tecken.
+**CORE-14** Givet en rubrik med svenska tecken och emoji (t.ex. "Åtgärd för ärende 😊"), när ärendet skapas och hämtas, då är texten oförändrad. Emojin 😊 räknas som ett tecken. Sammansatta emoji räknas som sina kodpunkter (🇸🇪 = 2, 👩‍💻 = 3), så en rubrik på 98 tecken + 👩‍💻 är 101 och avvisas.
 
 **CORE-15** Givet att inga ärenden finns, när listan hämtas, då svarar API:t 200 med en tom lista (inte ett fel).
 
@@ -161,10 +163,12 @@ Varje kriterium har ett id som används i tester, commits, PR:er och Linear-äre
 | Mutation | Ska fångas av |
 | --- | --- |
 | Trimningen tas bort (`" "` räknas som giltig rubrik) | CORE-11 |
+| Trimningen tar bara bort vanliga blanktecken, inte nollbreddstecken (`"\u200b"` räknas som giltig rubrik) | CORE-11 |
 | Gränsen ändras från `<= 100` till `< 100` | CORE-12 |
 | Ärendet sparas *innan* valideringen körs | CORE-06, 07, 08 |
 | `commit` tas bort (bara `flush`) | CORE-02 |
 | Den svenska felhanteraren för fel datatyp tas bort (FastAPI:s engelska standardfel går igenom) | CORE-17, CORE-16 |
+| Felhanteraren för ogiltig UTF-8 tas bort (Starlettes 400 på engelska går igenom) | CORE-17, CORE-16 |
 
 ## 7. Boundaries (för människor och AI-agenter)
 
@@ -174,7 +178,7 @@ Varje kriterium har ett id som används i tester, commits, PR:er och Linear-äre
 
 ## 8. Beslut och motivering
 
-Besluten är fattade av Nicklas (2026-10-24). B5, B7 och B8 är förtydligade eller tillagda efter Azaleas granskning av PR #5. B9 svarar på hennes fråga i godkännandet.
+Besluten är fattade av Nicklas (2026-10-24). B5, B7 och B8 är förtydligade eller tillagda efter Azaleas granskning av PR #5. B9 svarar på hennes fråga i godkännandet. B10 och B11, och ogiltig UTF-8 i CORE-17, kommer från hennes provkörning med Hypothesis och Schemathesis (kommentar i PR #5).
 
 | # | Fråga | Beslut | Skäl |
 | --- | --- | --- | --- |
@@ -187,6 +191,8 @@ Besluten är fattade av Nicklas (2026-10-24). B5, B7 och B8 är förtydligade el
 | B7 | Flera fel samtidigt | Visa alla, i fältordningen rubrik, beskrivning, kategori, prioritet, status | Handläggaren rättar allt på en gång. Frontend visar `detail` som det är. Fast ordning gör att testerna kan kontrollera exakt text. |
 | B8 | Id som inte är ett heltal (`GET /tickets/abc`) | 404 "Ärendet finns inte." | För handläggaren är det samma sak som ett okänt ärende, och frontend behöver bara visa ett meddelande. Alternativ: 422 med svenskt meddelande, mer tekniskt korrekt men ett fall till att hantera. Gäller även HIST-08. |
 | B9 | Fel datatyp och saknat fält samtidigt | Bara "Ogiltig indata." | Fel datatyp betyder att anropet är trasigt, vilket bara händer vid en bugg i klienten. En handläggare kan inte skriva en siffra som rubrik i formuläret. Fältmeddelandena är till för handläggaren och hjälper inte då. Ett meddelande är också enklare att bygga och testa. Alternativ: visa båda, i fältordningen. |
+| B10 | Vad räknas som tomt | Blanktecken enligt `str.strip()` + nollbreddstecken (U+200B, U+200C, U+200D, U+2060, U+FEFF) | En rubrik som ser tom ut för handläggaren ska behandlas som tom. `strip()` ensam släpper igenom nollbreddstecken. Listan är kort och går att testa tecken för tecken. Alternativ: alla osynliga Unicode-tecken (svårare att avgränsa och testa). |
+| B11 | Sammansatta emoji | Räknas som sina kodpunkter (🇸🇪 = 2, 👩‍💻 = 3) | Samma räkning i backend (`len`) och frontend (`[...text].length`), så de är alltid överens. Att räkna det man ser som ett tecken (grafemkluster) kräver extra bibliotek på båda sidor, för ett ovanligt fall. Alternativ: grafemkluster. |
 
 ## Ändringar
 
@@ -194,4 +200,4 @@ Besluten är fattade av Nicklas (2026-10-24). B5, B7 och B8 är förtydligade el
 | --- | --- | --- |
 | v0.1 | 2026-10-24 | Första utkastet, CORE-01–16 |
 | v0.2 | 2026-10-24 | Efter Azaleas granskning: fast felordning (B7), CORE-17 "Ogiltig indata.", id som inte är heltal ger 404 (B8), CORE-11 gäller även beskrivning, tecken = Unicode-kodpunkter, sorteringsriktning (B5), meddelande i CORE-09, gräns mot HIST-10, vem som implementerar |
-| v0.3 | 2026-10-25 | B9: fel datatyp tillsammans med saknat fält ger bara "Ogiltig indata." (CORE-17, avsnitt 4) |
+| v0.3 | 2026-10-25 | B9: fel datatyp tillsammans med saknat fält ger bara "Ogiltig indata." (CORE-17, avsnitt 4). Efter Azaleas provkörning (kommentar i PR #5): ogiltig UTF-8 i CORE-17, B10 vad som räknas som tomt (CORE-11), B11 sammansatta emoji (CORE-14), två nya mutationer |
