@@ -70,7 +70,7 @@ Skelettverktyget erbjöd ett monorepo. **Valt: separata mappar** (`backend/`, `f
 
 - **Att köra lösningen kräver Python 3.11, Node och pnpm.** README behöver beskriva alla tre, även för Windows.
 - **SQLite kontrollerar inte främmande nycklar som standard.** Backenden måste slå på det med `PRAGMA foreign_keys=ON` för varje anslutning, annars kan en historikpost peka på ett ärende som inte finns.
-- **Två språk:** typerna i frontend kan glida isär från backend. Därför genereras TypeScript-typerna från API:ts OpenAPI-schema med `openapi-typescript` (KSP-28). Tills dess är API-konventionerna och specarna det som håller ihop dem.
+- **Två språk:** typerna i frontend kan glida isär från backend. Därför genereras TypeScript-typerna från API:ts OpenAPI-schema med `openapi-typescript` (KSP-28), bekräftas på teammötet 2026-10-27. Tills dess är API-konventionerna och specarna det som håller ihop dem.
 - **Frontendtester:** Vitest och Testing Library är planerade (Teststrategin) men ännu inte installerade i `frontend/`.
 - **Designsystemet** behöver en egen instruktion för agenterna, så att utseendet inte ändras vid varje ny komponent.
 
