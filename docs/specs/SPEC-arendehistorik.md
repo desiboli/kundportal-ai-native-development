@@ -1,6 +1,6 @@
 # Spec: Statuslogik och ärendehistorik (kompletterande funktion)
 
-> Status: **utkast v0.5 för teamgranskning** · Ansvarig: Azalea (Azaalea) · Vecka 5
+> Status: **v0.6, ansvar och stack beslutade 2026-10-25** · Ansvarig: Azalea (Azaalea) · Vecka 5
 > Detta dokument är teamets underlag. Individuell redovisning ligger inte här.
 >
 > **Ändrat i v0.3 (2026-10-23), efter feedback från teamet:** kärnan får en
@@ -14,6 +14,9 @@
 > **Ändrat i v0.5 (2026-10-24), efter CORE-specen v0.2:** HIST-08 ger 404 "Ärendet finns inte."
 > även när id inte är ett heltal (samma som B8 i CORE). HIST-10 prövar bara att ingen
 > historikpost sparas; att inget ärende sparas prövas i CORE.
+>
+> **Ändrat i v0.6 (2026-10-25), efter teammötet:** stacken och ansvarstabellen är beslutade.
+> HIST-06 säger att fel datatyp ger "Ogiltig indata." (samma som B9 i CORE).
 
 **Gemensamma dokument (huvudversioner) i Linear.** Delar av specen gäller hela teamet och
 har därför fått egna dokument. Specen är fortfarande komplett, men vid skillnad gäller det
@@ -67,43 +70,37 @@ statusreglerna och `PATCH`, utökar `POST` så att den skriver historik, och lä
 - Status ändras bara via `PATCH /tickets/{id}/status` (HIST). CORE:s endpoints ändrar
   aldrig status.
 
-**Ansvar** (Bekräftat = överenskommet i Slack 2026-10-22–23. Förslag = tas upp på söndag.)
+**Ansvar** (bekräftat av alla fyra på teammötet 2026-10-25)
 
 | Del                                                                                                                                         | Ansvarig                       | Granskare       | Läge                                            |
 | ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ | --------------- | ------------------------------------------------ |
-| **Backend som helhet:** skelett, SQLite, kärnans API (CORE) och `/health`                                                          | Azalea                         | Nicklas         | Förslag                                         |
-| Statusregler, historik, transaktionsgräns, ADR-001                                                                                         | Azalea                         | Nicklas         | Bekräftat                                       |
-| API-kontrakt som OpenAPI (`/openapi.json`), klart innan frontend bygger mot det                                                           | Azalea                         | Mustafa         | Förslag                                         |
-| Tester för historik, atomicitet och persistens: **HIST-01, 02, 03, 04, 08, 09, 10, 11, 12** och invarianttestet                      | Azalea                         | Nicklas         | Förslag                                         |
-| Spec för kärnan (**CORE-01, 02 …**) i samma stil som denna                                                                         | Nicklas                        | Azalea          | Förslag (Nicklas erbjöd sig, Azalea säger ja) |
-| Tester för statusregler: **HIST-06, 07, 13**                                                                                         | Nicklas                        | Azalea          | Bekräftat                                       |
-| Tester för kärnans validering (CORE-kriterierna)                                                                                          | Nicklas                        | Azalea          | Förslag                                         |
-| Teamets verifieringsplan (`docs/verifiering.md`), HIST-raderna skrivs av Azalea                                                           | Nicklas                        | Azalea          | Bekräftat                                       |
-| Teknikbeslut om stacken (jämförelse och beslut, se antagande 1)                                                                           | Nicklas                        | Alla            | Förslag                                         |
-| Mutationsprövning, **korsvis** (avsnitt 10): var och en prövar sina egna tester                                                     | Azalea, Nicklas                | den andra       | Förslag                                         |
-| Instruktion för testförslag: v1                                                                                                           | Nicklas                        | Azalea          | Förslag                                         |
-| Förbättring av instruktionen: **var och en gör en egen, namngiven förbättring**, prövad på egna kriterier och jämförd med v1 | Azalea, Nicklas (var för sig) | den andra       | Förslag                                         |
-| Frontend: lista, detaljvy, formulär för att skapa ärenden, statusbyte, vitest                                                            | Mustafa                        | Azalea          | Förslag                                         |
-| Tidslinje (HIST-05) och **UI-delen av HIST-14** (felmeddelanden i UI), med komponenttest för tidslinjen | Amalia | Mustafa, Azalea | Valt av Amalia 2026-10-24, bekräftas söndag |
-| **Backend-delen av HIST-14:** alla fel som `{"detail": "<svenska>"}` utan stacktrace eller databasdetaljer | Azalea | Nicklas | Förslag |
-| Linear: milstolpar, ärenden och mallar (Nicklas lägger till fält för krav-id och "faller av rätt anledning")                           | Mustafa                        | Nicklas         | Förslag                                         |
+| **Backend som helhet:** skelett, SQLite, kärnans API (CORE) och `/health`                                                          | Azalea                         | Nicklas         | Bekräftat 2026-10-25 |
+| Statusregler, historik, transaktionsgräns, ADR-001                                                                                         | Azalea                         | Nicklas         | Bekräftat 2026-10-25 |
+| API-kontrakt som OpenAPI (`/openapi.json`), klart innan frontend bygger mot det                                                           | Azalea                         | Mustafa         | Bekräftat 2026-10-25 |
+| Tester för historik, atomicitet och persistens: **HIST-01, 02, 03, 04, 08, 09, 10, 11, 12** och invarianttestet                      | Azalea                         | Nicklas         | Bekräftat 2026-10-25 |
+| Spec för kärnan (**CORE-01, 02 …**) i samma stil som denna                                                                         | Nicklas                        | Azalea          | Bekräftat 2026-10-25 |
+| Tester för statusregler: **HIST-06, 07, 13**                                                                                         | Nicklas                        | Azalea          | Bekräftat 2026-10-25 |
+| Tester för kärnans validering (CORE-kriterierna)                                                                                          | Nicklas                        | Azalea          | Bekräftat 2026-10-25 |
+| Teamets verifieringsplan (`docs/verifiering.md`), HIST-raderna skrivs av Azalea                                                           | Nicklas                        | Azalea          | Bekräftat 2026-10-25 |
+| Teknikbeslut om stacken (jämförelse och beslut, se antagande 1)                                                                           | Nicklas                        | Alla            | Bekräftat 2026-10-25 |
+| Mutationsprövning, **korsvis** (avsnitt 10): var och en prövar sina egna tester                                                     | Azalea, Nicklas                | den andra       | Bekräftat 2026-10-25 |
+| Instruktion för testförslag: v1                                                                                                           | Nicklas                        | Azalea          | Bekräftat 2026-10-25 |
+| Förbättring av instruktionen: **var och en gör en egen, namngiven förbättring**, prövad på egna kriterier och jämförd med v1 | Azalea, Nicklas (var för sig) | den andra       | Bekräftat 2026-10-25 |
+| Frontend: lista, detaljvy, formulär för att skapa ärenden, statusbyte, vitest                                                            | Mustafa                        | Azalea          | Bekräftat 2026-10-25 |
+| Tidslinje (HIST-05) och **UI-delen av HIST-14** (felmeddelanden i UI), med komponenttest för tidslinjen | Amalia | Mustafa, Azalea | Bekräftat 2026-10-25 |
+| **Backend-delen av HIST-14:** alla fel som `{"detail": "<svenska>"}` utan stacktrace eller databasdetaljer | Azalea | Nicklas | Bekräftat 2026-10-25 |
+| Linear: milstolpar, ärenden och mallar (Nicklas lägger till fält för krav-id och "faller av rätt anledning")                           | Mustafa                        | Nicklas         | Bekräftat 2026-10-25 |
 
 Azalea bygger inte frontend. Hon granskar frontend-PR:er som rör API-kontraktet.
 
 ## 3. Antaganden (rätta mig nu)
 
-1. Webbapp som körs lokalt. Frontend **React + Vite + TypeScript**, lagring **SQLite**.
-   **Backend är ett öppet beslut till söndag:**
-
-   | Alternativ                                                         | För                                                                                           | Emot                                                                   |
-   | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-   | **A. Python 3.11 + FastAPI + SQLAlchemy 2.x** (förslag)     | Inbyggd validering (Pydantic), skelettet finns redan med test, backendansvarig är van vid det | Två språk i projektet                                                |
-   | **B. TypeScript rakt igenom** (t.ex. Node + Express/Fastify) | Ett språk, delade typer mellan frontend och backend                                           | Validering måste läggas till (t.ex. Zod), skelettet måste göras om |
-
-   Förslaget är A, och fördelen med B löses genom att frontend **genererar TypeScript-typer
-   från FastAPI:s OpenAPI-schema** (`openapi-typescript` mot `/openapi.json`). Då delar
-   frontend och backend ändå samma kontrakt. Nicklas skriver ned jämförelsen och beslutet.
-   Specen i övrigt gäller oavsett alternativ, utom kommandona i avsnitt 8.
+1. Webbapp som körs lokalt. **Stacken beslutades på teammötet 2026-10-25:** backend
+   **Python 3.11 + FastAPI + SQLAlchemy 2.x + SQLite** (port 8010), frontend **React + Vite +
+   TypeScript + Tailwind CSS v4 + shadcn/ui** med pnpm. Frontend genererar TypeScript-typer från
+   FastAPI:s OpenAPI-schema (`openapi-typescript` mot `/openapi.json`), så att frontend och
+   backend delar samma kontrakt. Alternativet TypeScript rakt igenom valdes bort. Nicklas
+   dokumenterar jämförelsen och beslutet i `docs/decisions/`.
 2. Statusar lagras och skickas som **stabila koder**, och UI visar svenska etiketter:
 
    | Kod (API/DB)            | Etikett (UI)     |
@@ -188,6 +185,7 @@ HIST-06, 07 och 13 är statusregler, de övriga gäller historiken.
 - **HIST-06** Givet en ogiltig status (`"klar"`), när statusändring försöks, då svarar
   API:t 422 med ett begripligt svenskt meddelande, ärendets status är oförändrad och
   ingen ny historikpost har skapats.
+  Fel datatyp (t.ex. `{"status": 5}`) ger i stället bara "Ogiltig indata." (samma som B9 i CORE).
 - **HIST-07** Givet att ärendet redan har status `in_progress`, när samma status skickas,
   då svarar API:t 409, och ingen historikpost skapas.
 - **HIST-08** Givet ett okänt ärende-id, när historik hämtas eller status ändras, då
@@ -368,21 +366,20 @@ test → körresultat i `docs/verifiering.md`.
 
 ## 12. Öppna frågor
 
-1. **Stack:** alternativ A (FastAPI + typer från OpenAPI) eller B (TypeScript rakt
-   igenom)? Se antagande 1. Beslutas på söndag, Nicklas dokumenterar.
+1. ~~**Stack**~~ Beslutad 2026-10-25, se antagande 1.
 2. Statuskoder i API/DB och svenska etiketter i UI (antagande 2): ok för teamet innan
    frontend börjar använda värdena?
 3. Ska `closed` kunna öppnas igen? (Jag antar ja, HIST-13.)
-4. Azalea tar backend som helhet (skelett, CORE och HIST) och bygger inte frontend. Ok?
-5. Mustafa: frontend (lista, detaljvy, formulär, statusbyte). Ok?
+4. ~~Azalea tar backend som helhet~~ Bekräftat 2026-10-25.
+5. ~~Mustafa: frontend~~ Bekräftat 2026-10-25.
 6. ~~Amalia: vilken egen del?~~ Amalia har valt tidslinjen (HIST-05) och UI-delen av
-   HIST-14, se PR #7 (Amalia tar tidslinje och felmeddelanden i UI, HIST-05 och HIST-14): https://github.com/desiboli/kundportal-ai-native-development/pull/7. Bekräftas söndag.
+   HIST-14, se PR #7 (Amalia tar tidslinje och felmeddelanden i UI, HIST-05 och HIST-14): https://github.com/desiboli/kundportal-ai-native-development/pull/7. Bekräftat 2026-10-25.
 7. Instruktionen för testförslag: Nicklas skriver v1, och var och en gör sedan en egen,
    namngiven förbättring som prövas på egna kriterier. Ok?
 8. Mutationsprövning korsvis enligt avsnitt 10. Ok?
 9. Linear: ett ärende per task med krav-id, och datum på milstolparna (förslag: 01–02 v5,
    03 v6, 04–05 v7, 06 v8). Ok?
-10. Mötestid söndag (Google Meet-rummet).
+10. ~~Mötestid~~ Mötet hölls 2026-10-25.
 
 ## 13. Utökningar (parkerade)
 
