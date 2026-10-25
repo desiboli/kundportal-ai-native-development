@@ -29,6 +29,9 @@ till att varje gräns i kravet testas på båda sidor, och att förslaget går s
    t.ex. minsta och största längd. För varje gräns: ta fram ett fall **precis under**,
    **precis på** och **precis över**, för både den nedre och den övre gränsen. Står ingen
    nedre gräns i specen: skriv det som en fråga i stället för att hitta på en.
+   "Under den nedre gränsen" är ofta samma fall som ett tomt fält (t.ex. 0 tecken efter
+   trimning, CORE-06/07/11). Hänvisa då till det kravet i stället för att föreslå testet en
+   gång till.
 3. **Hur räknas det (nytt i v2).** Skriv ut hur specen räknar, t.ex. "tecken = Unicode-
    kodpunkter, efter trimning". Ta fram minst ett fall nära gränsen som ger **fel resultat**
    om koden räknar på ett annat sätt (före trimning, i byte, i UTF-16 eller i synliga tecken).
