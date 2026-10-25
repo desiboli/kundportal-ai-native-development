@@ -11,4 +11,14 @@ export default defineConfig({
       "@": resolve(import.meta.dirname, "./src"),
     },
   },
+  server: {
+    // Anrop till /api/... skickas vidare till backenden på port 8010 utan /api,
+    // så /api/health blir /health. Då behövs ingen CORS i backenden.
+    proxy: {
+      "/api": {
+        target: "http://localhost:8010",
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+    },
+  },
 })
