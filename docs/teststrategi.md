@@ -55,6 +55,8 @@ rätt anledning.
 | Tom rubrik accepteras | CORE-06, CORE-11 | Nicklas |
 | Gränsen `<= 100` ändras till `< 100` | CORE-12 | Nicklas |
 
+Tabellen visar ett urval. Fler mutationer för kärnan finns i [CORE-specen](specs/SPEC-karna.md), avsnitt 6, och för historiken i [HIST-specen](specs/SPEC-arendehistorik.md), avsnitt 10.
+
 Var och en prövar bara **sina egna** tester i steg 1. Steg 1 görs och dokumenteras (körresultat
 i Verification-ärendet) innan steg 2 börjar, så att det syns vem som hittade vad.
 
@@ -71,8 +73,8 @@ Windows) kan komplettera för jämförelser och gränser. `mutmut` kräver WSL.
 
 ## 4. Instruktion för testförslag (AI)
 
-- **v1** skrivs av Nicklas och används av alla för att få testförslag från AI utifrån ett
-  krav-id.
+- **v1** ([`docs/ai/testforslag-v1.md`](ai/testforslag-v1.md)) skrivs av Nicklas och används av
+  alla för att få testförslag från AI utifrån ett krav-id.
 - Var och en gör sedan en **egen, namngiven förbättring** utifrån en begränsning hen hittat,
   prövar den på sina egna kriterier och jämför med v1. Vi granskar varandras förbättringar,
   men skriver dem inte åt varandra.
