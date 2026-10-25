@@ -1,7 +1,7 @@
 # ADR-002: Teknikstack för Kundserviceportalen
 
 > Status: **föreslaget, väntar på teamets godkännande** · Ansvarig: Nicklas (yrrving) · Datum: 2026-10-25
-> Underlag: Slack 2026-10-21–25, teammötet 2026-10-25, PR #3 (backendskelett) och PR #11 (frontendskelett).
+> Underlag: Slack 2026-10-21–25, teammötet 2026-10-25, PR #3 (backendskelett: FastAPI, SQLite och /health): https://github.com/desiboli/kundportal-ai-native-development/pull/3 och PR #11 (frontend-skelett med React, Vite och TypeScript): https://github.com/desiboli/kundportal-ai-native-development/pull/11.
 
 ## Kontext
 
@@ -26,6 +26,8 @@ Stacken diskuterades i Slack och landade under mötet 2026-10-25, när backend- 
 | Pakethanterare (frontend) | pnpm |
 | Struktur | `backend/` och `frontend/` som separata mappar i samma repo, inte ett monorepo-verktyg |
 
+Exakta versioner står i `backend/requirements.txt` och `frontend/package.json`, och de filerna gäller om något här skiljer sig.
+
 ## Alternativ och avvägning
 
 ### 1. Backend: FastAPI eller TypeScript hela vägen
@@ -35,11 +37,11 @@ Stacken diskuterades i Slack och landade under mötet 2026-10-25, när backend- 
 | För | Inbyggd validering via Pydantic passar kravet på obligatoriska fält. Automatisk API-dokumentation (Swagger). Backend-ansvarig har byggt liknande förut. | Ett språk i hela stacken. Delade typer mellan frontend och backend utan extra steg. |
 | Emot | Två språk i projektet. Typerna i frontend måste hållas i synk med backend. | Validering och API-dokumentation måste byggas eller väljas till. Ingen i teamet har pekat ut det som sin styrka för backend. |
 
-**Valt: FastAPI.** Den inbyggda valideringen gör det enkelt att bygga och testa kraven i CORE-specen. Valet följer också den som ansvarar för backend. Nackdelen med två språk kan minskas genom att generera TypeScript-typer från API:ts OpenAPI-schema (`openapi-typescript`), se Öppna frågor.
+**Valt: FastAPI.** Den inbyggda valideringen gör det enkelt att bygga och testa kraven i CORE-specen. Valet följer också den som ansvarar för backend. Nackdelen med två språk minskas genom att TypeScript-typerna genereras från API:ts OpenAPI-schema (`openapi-typescript`), se Konsekvenser.
 
 ### 2. Databas: SQLite
 
-Alternativ: PostgreSQL eller en JSON-fil. PostgreSQL kräver en databasserver, vilket gör det svårare för någon annan att köra lösningen. En JSON-fil saknar transaktioner, som historiken behöver (ADR-001). **SQLite** är en vanlig fil, kräver ingen installation och klarar både beständighet och transaktioner.
+Alternativ: PostgreSQL eller en JSON-fil. PostgreSQL kräver en databasserver, vilket gör det svårare för någon annan att köra lösningen. En JSON-fil saknar transaktioner, som historiken behöver ([ADR-001](ADR-001-atomicitet-status-och-historik.md)). **SQLite** är en vanlig fil, kräver ingen installation och klarar både beständighet och transaktioner. Nackdelen är att bara en skrivning åt gången går igenom. Det räcker för en app som körs lokalt av en person, men inte för många samtidiga användare.
 
 ### 3. Utseende: vanliga shadcn/ui, ett register eller bara Tailwind
 
@@ -52,7 +54,7 @@ Alternativ: PostgreSQL eller en JSON-fil. PostgreSQL kräver en databasserver, v
 
 ### 4. Grundkomponenter: Base UI eller Radix
 
-shadcn/ui kan bygga på Radix eller Base UI. Båda ger tillgängliga komponenter (tangentbord, fokus, skärmläsare). Base UI är nyare och är det shadcn nu föreslår som standard. **Valt: Base UI** (förvalt i skelettet, PR #11). Ingen i teamet hade starkare önskemål, och skillnaden märks inte i vårt flöde.
+shadcn/ui kan bygga på Radix eller Base UI. Båda ger tillgängliga komponenter (tangentbord, fokus, skärmläsare). Base UI är nyare och är det shadcn nu föreslår som standard. **Valt: Base UI** (förvalt i skelettet, PR #11 (frontend-skelett med React, Vite och TypeScript): https://github.com/desiboli/kundportal-ai-native-development/pull/11). Ingen i teamet hade starkare önskemål, och skillnaden märks inte i vårt flöde.
 
 Risk: AI-verktygen har sett mer kod för Radix än för Base UI och kan föreslå Radix-mönster. Det fångas i granskningen och i instruktionen för designsystemet.
 
@@ -67,7 +69,8 @@ Skelettverktyget erbjöd ett monorepo. **Valt: separata mappar** (`backend/`, `f
 ## Konsekvenser
 
 - **Att köra lösningen kräver Python 3.11, Node och pnpm.** README behöver beskriva alla tre, även för Windows.
-- **Två språk:** typerna i frontend kan glida isär från backend. Tills `openapi-typescript` är infört är API-konventionerna och specarna det som håller ihop dem.
+- **SQLite kontrollerar inte främmande nycklar som standard.** Backenden måste slå på det med `PRAGMA foreign_keys=ON` för varje anslutning, annars kan en historikpost peka på ett ärende som inte finns.
+- **Två språk:** typerna i frontend kan glida isär från backend. Därför genereras TypeScript-typerna från API:ts OpenAPI-schema med `openapi-typescript` (KSP-28). Tills dess är API-konventionerna och specarna det som håller ihop dem.
 - **Frontendtester:** Vitest och Testing Library är planerade (Teststrategin) men ännu inte installerade i `frontend/`.
 - **Designsystemet** behöver en egen instruktion för agenterna, så att utseendet inte ändras vid varje ny komponent.
 
@@ -75,6 +78,5 @@ Skelettverktyget erbjöd ett monorepo. **Valt: separata mappar** (`backend/`, `f
 
 | Fråga | Ägare | När |
 | --- | --- | --- |
-| Inför vi `openapi-typescript` för genererade typer? | Azalea + Musse | Innan frontend anropar `/tickets` |
 | Byter vi till ett register eller behåller vanliga shadcn? | Amalia | Efter hennes test på branch |
 | Vilken Node-version gäller (anges i README)? | Musse | Med frontendens körinstruktioner |
