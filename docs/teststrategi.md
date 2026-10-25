@@ -20,7 +20,7 @@
 
 | Nivå | Vad | Verktyg | Täcker | Ansvarig |
 | --- | --- | --- | --- | --- |
-| Enhet | Statusregler (samma status, giltiga värden, återöppning) | pytest | HIST-06, 07, 13 | Nicklas |
+| Enhet och integration | Statusregler (samma status, giltiga värden, återöppning). Integrationstestet visar statuskoden och att ingen post finns i databasen | pytest, TestClient, temporär fil | HIST-06, 07, 13 | Nicklas |
 | Enhet / integration | Validering i kärnan (obligatoriska fält, gränsvärden) | pytest + TestClient, Hypothesis för gränsvärden | CORE-kriterierna | Nicklas |
 | Integration (API + riktig SQLite-fil) | Hela kedjan router → service → databas | pytest + TestClient, temporär fil | HIST-01–03, 08, 10–12 | Azalea |
 | Integration, omstart | Ny engine och session mot samma fil | pytest, temporär fil | HIST-04 | Azalea |
