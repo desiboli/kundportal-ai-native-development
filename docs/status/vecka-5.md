@@ -157,7 +157,7 @@ spec för kärnan och verifieringsplan (Nicklas), backendskelett (Azalea), front
 | ~~Meddelande för 409 och för fel när historiken inte kan sparas (HIST-07, HIST-09)~~ öppen i PR #19 (HIST-spec v0.7, luckor och ADR-001): https://github.com/desiboli/kundportal-ai-native-development/pull/19 | Azalea |
 | Ärendemodell och `POST`/`GET /tickets` enligt CORE (vecka 6) | Azalea |
 | ~~Linear-ärenden per uppgift, med krav-id i beskrivningen~~ 53 ärenden inlagda (KSP-6–58). Var och en kontrollerar sina och flyttar dem när arbetet börjar | Alla |
-| Ta ställning till fynden om CORE-11, CORE-14 och CORE-17 i kommentaren på PR #5: https://github.com/desiboli/kundportal-ai-native-development/pull/5#issuecomment-6394982815 | Nicklas |
+| ~~Ta ställning till fynden om CORE-11, CORE-14 och CORE-17 i kommentaren på PR #5: https://github.com/desiboli/kundportal-ai-native-development/pull/5#issuecomment-6394982815~~ gjort i CORE-spec v0.3, PR #10 (B9–B11): https://github.com/desiboli/kundportal-ai-native-development/pull/10 | Nicklas |
 | Uppdatera beskrivningen i den löpande PR:n med alla fyra och länkar | Mustafa |
 | Nicklas godkänner #19 igen (godkännandet försvann när `main` mergades in) och granskar #21 | Nicklas |
 | ~~Granska PR #16, #20, #14 och #22~~ godkända och mergade | Azalea |
