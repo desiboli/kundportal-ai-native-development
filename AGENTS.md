@@ -16,6 +16,7 @@ historiken. Grupparbete i kursen AI Native Development (Grupp 6).
 | Ansvar | Vem äger och granskar vad | `docs/ansvar-och-granskning.md` |
 | Veckostatus | En fil per vecka | `docs/status/` |
 | Gemensamma regler | API-konventioner, arkitektur, teststrategi | `docs/api-konventioner.md`, `docs/arkitektur.md`, `docs/teststrategi.md` |
+| AI-instruktioner | Teamets instruktion för testförslag (v1) och var och ens namngivna förbättring | `docs/ai/` |
 
 ## Kommandon
 
@@ -25,11 +26,18 @@ cd backend
 .\.venv\Scripts\python -m uvicorn app.main:app --reload --reload-dir app --port 8010
 ```
 
+```bash
+cd backend
+.venv/bin/python -m pytest -q                      # macOS/Linux
+.venv/bin/python -m uvicorn app.main:app --reload --reload-dir app --port 8010
+```
+
 Frontend: se `frontend/README.md` (pnpm). Backend körs på **port 8010**, inte 8000.
 
 ## Alltid
 
 - **Läs rätt spec först.** Varje ändring utgår från ett krav-id (`CORE-xx` eller `HIST-xx`).
+- **Testförslag från AI** tas fram enligt instruktionen i `docs/ai/` (t.ex. *"Föreslå tester för CORE-07 enligt docs/ai/testforslag-v1.md"*) och granskas innan testkoden skrivs.
 - **Krav-id i allt:** i testets namn eller docstring, i commit-meddelandet och i PR:en.
 - **Testerna först:** skriv eller ändra testet, se det falla av rätt anledning, bygg sedan.
 - **Kör testerna före varje commit.** CI kör dem igen på varje PR.
