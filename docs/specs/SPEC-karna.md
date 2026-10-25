@@ -1,6 +1,6 @@
 # Spec: Kärnan – skapa, lista, visa och validera ärenden (CORE)
 
-> Status: **utkast v0.4** · v0.2 granskad och godkänd av Azalea (PR #5) · Ansvarig: Nicklas (yrrving) · Granskare: Azalea (Azaalea) · Vecka 5
+> Status: **utkast v0.4** · v0.2 granskad och godkänd av Azalea (PR #5), v0.3 (PR #10) och v0.4 (PR #22) likaså · Ansvarig: Nicklas (yrrving) · Granskare: Azalea (Azaalea) · Vecka 5
 > Detta dokument är teamets underlag. Individuell redovisning ligger inte här.
 >
 > Bygger på [API-konventioner](../api-konventioner.md)
@@ -94,7 +94,7 @@ En handläggare ska kunna **registrera ett nytt kundärende**, se **en lista öv
 | Fel datatyp (t.ex. `"title": 5`), saknad kropp, trasig JSON eller ogiltiga tecken (ogiltig UTF-8) | Ogiltig indata. |
 | Okänt ärende eller id som inte är ett heltal | Ärendet finns inte. |
 
-Om flera fält är fel samtidigt visas **alla** meddelanden, sammanfogade med mellanslag, i fältordningen rubrik, beskrivning, kategori, prioritet, status (beslut B7).
+Om flera fält är fel samtidigt visas **alla** meddelanden, sammanfogade med mellanslag, i fältordningen rubrik, beskrivning, kategori, prioritet, status (beslut B7, CORE-18).
 
 Undantag: om något fält har fel datatyp, eller kroppen saknas eller är trasig JSON, visas **bara** "Ogiltig indata.", utan fältmeddelanden (beslut B9).
 
@@ -128,7 +128,7 @@ Varje kriterium har ett id som används i tester, commits, PR:er och Linear-äre
 
 **CORE-17** Givet fel datatyp (t.ex. `"title": 5`), en saknad kropp, trasig JSON eller en kropp med ogiltig UTF-8, när ärendet skapas, då svarar API:t 422 med "Ogiltig indata." och inget ärende sparas. Det gäller även när ett annat fält samtidigt saknas: då visas bara "Ogiltig indata." (beslut B9).
 
-**CORE-18** Givet att flera fält är fel samtidigt (t.ex. rubrik saknas och beskrivningen är för lång), när ärendet skapas, då svarar API:t 422 med alla meddelanden, sammanfogade med mellanslag i fältordningen rubrik, beskrivning, kategori, prioritet, status (beslut B7), och inget ärende sparas. Undantag: fel datatyp ger bara "Ogiltig indata." (CORE-17).
+**CORE-18** Givet att flera fält är fel samtidigt (t.ex. rubrik saknas och beskrivningen är för lång), när ärendet skapas, då svarar API:t 422 med alla meddelanden, sammanfogade med mellanslag i fältordningen rubrik, beskrivning, kategori, prioritet, status (beslut B7), och inget ärende sparas. Exempel: rubrik saknas och beskrivningen har 2001 tecken ger "Rubrik måste fyllas i. Beskrivningen får vara högst 2000 tecken." Undantag: fel datatyp ger bara "Ogiltig indata." (CORE-17).
 
 ### Gränsfall
 
