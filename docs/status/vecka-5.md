@@ -48,6 +48,20 @@ spec för kärnan och verifieringsplan (Nicklas), backendskelett (Azalea), front
 | Frontenden visar backendens `/health` via Vite-proxy till port 8010, frontendkommandon i README | Azalea | PR #15 (koppla frontend till backendens /health): https://github.com/desiboli/kundportal-ai-native-development/pull/15 |
 | Instruktion för testförslag v1 (teamets återanvändbara AI-moment) | Nicklas | PR #16 (instruktion för testförslag v1): https://github.com/desiboli/kundportal-ai-native-development/pull/16 (granskad av Azalea med kommentarer) |
 | API-konventioner, arkitektur och teststrategi flyttade från Linear till `docs/` (repot är huvudversion) | Azalea | PR #17 (gemensamma dokument flyttade från Linear till repot): https://github.com/desiboli/kundportal-ai-native-development/pull/17 |
+| HIST-spec v0.7: luckorna från körningarna av testinstruktion v1 (meddelanden för HIST-06/07, 500 vid HIST-09, omstart i HIST-04), statusbytet i milstolpe 03, ADR-001 i `docs/decisions/` | Azalea | PR #19 (HIST-spec v0.7, luckor och ADR-001): https://github.com/desiboli/kundportal-ai-native-development/pull/19 (bygger på #12 och #17) |
+
+### Backloggen i Linear (söndag kväll)
+
+53 ärenden (KSP-6 till KSP-58) i [Linear: Kundserviceportalen](https://linear.app/grupp6/project/kundserviceportalen-be4a4840b5ef), ett per leverans eller PR, med krav-id i beskrivningen, ägare och milstolpe. Arbete som redan är gjort ligger som Done (t.ex. KSP-14 backendskelett), öppna PR:er som In Progress. Beroenden är inlagda (t.ex. att frontenden väntar på API-kontraktet, KSP-20). Platshållaren KSP-5 är avbruten. Lagt in av Azalea, som Mustafa godkände.
+
+| Milstolpe | Ärenden |
+| --- | --- |
+| 01 Planning & Architecture | KSP-6–13: specarna, ADR-001, ADR-002, AGENTS.md, gemensamma dokument, ansvar |
+| 02 Foundation & Database | KSP-14–19: skeletten, frontend–backend, CI, README |
+| 03 Case Management | KSP-20–32: API-kontrakt, felformat, CORE-endpoints, statusbytet, CORE- och statustester, frontendens lista, formulär, detaljvy och statusbyte |
+| 04 Additional Feature | KSP-33–38: historiktabellen, TicketService, history-endpointen, HIST-09 som agentuppdrag, tidslinje, felmeddelanden i UI |
+| 05 Testing & Verification | KSP-39–48: HIST-tester, Schemathesis, mutationsprövning (två), komponenttester, verifieringsplanen |
+| 06 Documentation & Delivery | KSP-49–58: testinstruktion v1 och egna förbättringar, veckostatus V5–V8, löpande PR, demo, slutleverans |
 
 ## Beslut på teammötet 2026-10-25
 
@@ -106,14 +120,15 @@ spec för kärnan och verifieringsplan (Nicklas), backendskelett (Azalea), front
 
 | Vad | Varför | Plan |
 | --- | --- | --- |
-| Sex PR:er väntar på granskning (tabellen "Öppna PR:er" ovan), och PR #7 (Amalia tar tidslinje och felmeddelanden i UI): https://github.com/desiboli/kundportal-ai-native-development/pull/7 väntar på att konversationerna löses | Öppnade söndag eftermiddag | Granska måndag. Merge-ordning: först de gemensamma dokumenten (de andra länkar till `docs/`), sedan HIST-spec v0.6 och AGENTS.md/CI, sist kopplingen frontend–backend |
+| Sju PR:er väntar på granskning (tabellen "Öppna PR:er" ovan), och PR #7 (Amalia tar tidslinje och felmeddelanden i UI): https://github.com/desiboli/kundportal-ai-native-development/pull/7 väntar på att konversationerna löses | Öppnade söndag eftermiddag | Granska måndag. Merge-ordning: först de gemensamma dokumenten (de andra länkar till `docs/`), sedan HIST-spec v0.6 och AGENTS.md/CI, sist kopplingen frontend–backend |
 | CI är inte ett krav för merge än | Regeln "Protect main" kräver inte kontrollen `backend` | Mustafa (admin) lägger till `backend` som obligatorisk kontroll när PR:n med AGENTS.md och CI är mergad |
 | Ansvarsdokumentet står som "Förslag" | Ändras efter Amalias PR #7 (tidslinje och felmeddelanden i UI): https://github.com/desiboli/kundportal-ai-native-development/pull/7, annars blir det konflikt | Azalea sätter "Bekräftat" när den är mergad |
 | CORE-specen och HIST-specen i Linear är fortfarande kopior | Repot är huvudversion | Ersätts med länkar till repot (CORE: Nicklas, HIST och Ansvar: Azalea) |
-| Verifieringsplan saknas | Ägs av Nicklas, bygger på specarna | Första utkast vecka 6 |
+| Verifieringsplan saknas | Ägs av Nicklas, bygger på specarna | Första utkast vecka 6 (KSP-47, HIST-raderna KSP-48) |
 | Beskrivningen i den löpande PR:n (Technigo#2): https://github.com/Technigo/kundportal-ai-native-development/pull/2 saknar Azalea, Amalia och länkar | Bara Mustafa, som öppnade PR:n, kan ändra den | Mustafa uppdaterar. PR #3 (backendskelett): https://github.com/desiboli/kundportal-ai-native-development/pull/3 och PR #4 (spec, ansvar och veckostatus V5): https://github.com/desiboli/kundportal-ai-native-development/pull/4 är nu mergade, så länkarna till `docs/` fungerar |
 | Backendskelettet mergades utan att Nicklas hann granska | Mustafa godkände först | Nicklas kan granska i efterhand med kommentarer i PR #3 (backendskelett: FastAPI, SQLite och /health): https://github.com/desiboli/kundportal-ai-native-development/pull/3 |
-| Inga Linear-ärenden per uppgift än | Strukturen och mallarna finns, ärendena inte | Skapas efter söndagsmötet |
+| Några Linear-ärenden saknar ansvarig: CI för frontend (KSP-18), veckostatus V6–V8 (KSP-53–55), demo (KSP-57), slutleverans (KSP-58) | Inte bestämt på mötet | Fördelas på nästa avstämning |
+| Frontenden har inga egna krav-id | Frontendärendena pekar på CORE- och HIST-id tills vidare | Teamet beslutar senare om en frontendspec behövs |
 
 ## Nästa steg
 
@@ -127,9 +142,9 @@ spec för kärnan och verifieringsplan (Nicklas), backendskelett (Azalea), front
 | ~~Godkänna PR #5~~ godkänd och mergad 2026-10-24: PR #5 (spec för kärnan, CORE-01–16): https://github.com/desiboli/kundportal-ai-native-development/pull/5. HIST-08 och HIST-10 ändrade i PR #9 (HIST-spec v0.5, HIST-08 och HIST-10 efter CORE v0.2): https://github.com/desiboli/kundportal-ai-native-development/pull/9 | Azalea |
 | ~~Koppla frontend till `/health`~~ gjort av Azalea i PR #15 (koppla frontend till backendens /health): https://github.com/desiboli/kundportal-ai-native-development/pull/15 | Azalea |
 | ~~Granska PR #10 (CORE-spec v0.3, B9): https://github.com/desiboli/kundportal-ai-native-development/pull/10~~ godkänd och mergad 2026-10-25 | Azalea |
-| Meddelande för 409 och för fel när historiken inte kan sparas (HIST-07, HIST-09) | Azalea |
+| ~~Meddelande för 409 och för fel när historiken inte kan sparas (HIST-07, HIST-09)~~ öppen i PR #19 (HIST-spec v0.7, luckor och ADR-001): https://github.com/desiboli/kundportal-ai-native-development/pull/19 | Azalea |
 | Ärendemodell och `POST`/`GET /tickets` enligt CORE (vecka 6) | Azalea |
-| Linear-ärenden per uppgift, med krav-id i beskrivningen | Alla lägger in sina |
+| ~~Linear-ärenden per uppgift, med krav-id i beskrivningen~~ 53 ärenden inlagda (KSP-6–58). Var och en kontrollerar sina och flyttar dem när arbetet börjar | Alla |
 | Ta ställning till fynden om CORE-11, CORE-14 och CORE-17 i kommentaren på PR #5: https://github.com/desiboli/kundportal-ai-native-development/pull/5#issuecomment-6394982815 | Nicklas |
 | Uppdatera beskrivningen i den löpande PR:n med alla fyra och länkar | Mustafa |
 | Svara på radkommentarerna i PR #7 (Amalia tar tidslinje och felmeddelanden i UI, HIST-05 och HIST-14): https://github.com/desiboli/kundportal-ai-native-development/pull/7 så att den kan mergas (alla konversationer måste vara lösta) | Amalia |
