@@ -226,8 +226,8 @@ HIST-06, 07 och 13 är statusregler, de övriga gäller historiken.
   Statusen är oförändrad även när databasfilen läses med en ny engine, och nästa
   statusändring på samma ärende lyckas (sessionen lämnas inte trasig).
 - **HIST-10** Givet att ärendet inte kan skapas (t.ex. tom rubrik), när `POST` körs, då
-  finns ingen historikpost kvar. (Att inget *ärende* sparas prövas i CORE-06–09, 11–13
-  och 17. HIST-10 prövar bara historiken, så samma fall testas inte två gånger.)
+  finns ingen historikpost kvar. (Att inget *ärende* sparas prövas i CORE-06–09, 11–13,
+  17 och 18. HIST-10 prövar bara historiken, så samma fall testas inte två gånger.)
 
 **Gränsfall**
 
