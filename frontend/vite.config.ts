@@ -11,4 +11,14 @@ export default defineConfig({
       "@": resolve(import.meta.dirname, "./src"),
     },
   },
+  server: {
+    // Requests to /api/... are forwarded to the backend on port 8010 without /api,
+    // so /api/health becomes /health. This way the backend needs no CORS.
+    proxy: {
+      "/api": {
+        target: "http://localhost:8010",
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+    },
+  },
 })
