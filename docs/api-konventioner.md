@@ -61,6 +61,9 @@ Alla fel, även valideringsfel, har samma form:
 
 - Allt som användaren ser är på **svenska**.
 - Fältnamn, endpoints och statuskoder är på **engelska**, i `snake_case`.
+- All kod är på **engelska**: namn på funktioner, variabler, typer och filer, och kommentarer.
+  Undantag: texter som visas för användaren och felmeddelanden i `detail`, som är på svenska.
+  Dokumentationen i `docs/` och commit-meddelanden skrivs fortfarande på svenska.
 - Endast påhittade kunduppgifter, aldrig riktiga.
 
 ## 5. Endpoints (översikt)
