@@ -21,7 +21,7 @@ Statusar lagras och skickas som **stabila koder på engelska**. UI visar svenska
 - Nya ärenden får alltid `new`.
 - Alla övergångar mellan *olika* statusar är tillåtna, även att öppna ett avslutat ärende
   igen (`closed` → `new`).
-- Samma status som nuvarande ger 409.
+- Samma status som nuvarande ger 409, för alla fyra statusar.
 - Status ändras **bara** via `PATCH /tickets/{id}/status`. Inga andra endpoints ändrar status.
 - Frontend håller en enda tabell från kod till etikett. Koder visas aldrig för användaren.
 
@@ -45,10 +45,11 @@ Alla fel, även valideringsfel, har samma form:
 | --- | --- | --- |
 | 200 / 201 | Lyckat / skapat | Ärende hämtat / skapat |
 | 404 | Okänt ärende, även id som inte är ett heltal (B8 i CORE, HIST-08) | `GET /tickets/999`, `GET /tickets/abc` → "Ärendet finns inte." |
-| 409 | Konflikt med nuvarande läge | Samma status som nuvarande |
-| 422 | Ogiltig indata | Tom rubrik, okänd status (`"klar"`). Vanliga fältfel visas i fältordningen (B7) |
+| 409 | Konflikt med nuvarande läge | Samma status som nuvarande → "Ärendet har redan den statusen." (HIST-07) |
+| 422 | Ogiltig indata | Tom rubrik, okänd status (`"klar"` → "Välj en giltig status.", HIST-06). Vanliga fältfel visas i fältordningen (B7) |
 | 422 | Trasigt anrop | Fel datatyp, saknad kropp eller trasig JSON → bara "Ogiltig indata." (CORE-17, B9) |
 | 500 | Oväntat fel | Svarar ändå med `{"detail": ...}` utan tekniska detaljer |
+| 503 | Databasen går inte att använda just nu (tillfälligt) | `/health` → "Databasen går inte att nå just nu." · historikposten kunde inte sparas → "Statusen kunde inte ändras. Försök igen." och inget ändras (HIST-09) |
 
 ## 3. Tider
 
@@ -69,7 +70,7 @@ Alla fel, även valideringsfel, har samma form:
 | `POST /tickets` | CORE (+ HIST skriver `created`-post) | 201, ärendet | 422 |
 | `GET /tickets` | CORE | 200, lista, nyaste först | – |
 | `GET /tickets/{id}` | CORE | 200, ärendet | 404 |
-| `PATCH /tickets/{id}/status` | HIST | 200, ärendet med ny status | 404 · 409 · 422 |
+| `PATCH /tickets/{id}/status` | HIST | 200, ärendet med ny status | 404 · 409 · 422 · 503 |
 | `GET /tickets/{id}/history` | HIST | 200, lista äldst först (minst en post) | 404 |
 | `GET /health` | Skelett | 200, `{"status": "ok", "database": "ok"}` | 503 |
 

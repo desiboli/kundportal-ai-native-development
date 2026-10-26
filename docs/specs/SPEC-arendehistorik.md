@@ -1,6 +1,6 @@
 # Spec: Statuslogik och ärendehistorik (kompletterande funktion)
 
-> Status: **v0.6, ansvar och stack beslutade 2026-10-25** · Ansvarig: Azalea (Azaalea) · Vecka 5
+> Status: **v0.7, luckor från testförslagskörningarna fyllda** · Ansvarig: Azalea (Azaalea) · Vecka 5
 > Detta dokument är teamets underlag. Individuell redovisning ligger inte här.
 >
 > **Ändrat i v0.3 (2026-10-23), efter feedback från teamet:** kärnan får en
@@ -17,6 +17,12 @@
 >
 > **Ändrat i v0.6 (2026-10-25), efter teammötet:** stacken och ansvarstabellen är beslutade.
 > HIST-06 säger att fel datatyp ger "Ogiltig indata." (samma som B9 i CORE).
+>
+> **Ändrat i v0.7 (2026-10-25), efter körningarna av testinstruktion v1:** exakta meddelanden
+> för ogiltig status (HIST-06) och samma status (HIST-07), svaret när historiken inte kan
+> sparas (HIST-09, 503), vad omstart betyder i testet (HIST-04), vem som äger testerna för
+> HIST-07, ADR-001 i `docs/decisions/`. Statusbytet hör till milstolpe 03, eftersom
+> examinationen räknar "ändra status" till kärnan. Historiken är tilläggsfunktionen (04).
 
 **Gemensamma dokument (huvudversioner) i repot.** Delar av specen gäller hela teamet och
 har därför fått egna dokument. Specen är fortfarande komplett, men vid skillnad gäller det
@@ -34,6 +40,12 @@ gemensamma dokumentet, och ändringar görs där först.
 Handläggare ska kunna **ändra status på ett ärende** och se **vad som hänt med ärendet och
 när**. Varje gång ett ärende skapas eller byter status sparas en oföränderlig historikpost.
 Historiken visas som en tidslinje i ärendets detaljvy.
+
+**Kärna och tilläggsfunktion.** Statusbytet (`PATCH /tickets/{id}/status` och statusreglerna,
+HIST-06, 07, 08, 13) hör till kärnan, eftersom uppgiften kräver "ändra status på ett ärende"
+(milstolpe 03). **Den kompletterande funktionen är ärendehistoriken** (HIST-01–05, 09–12, 14,
+milstolpe 04). Båda ligger i samma spec eftersom historiken skrivs i samma transaktion som
+statusbytet.
 
 **Varför just historik?** Funktionen berör alla lager (databas, tjänstelogik, API, UI) och
 har en verklig teknisk risk: statusändringen och historikposten måste lyckas eller
@@ -137,7 +149,7 @@ om `event_type = 'created'`. Poster ändras eller tas aldrig bort av applikation
 | Metod och väg                 | Lyckat svar                                                     | Fel                                                                        |
 | ------------------------------ | --------------------------------------------------------------- | -------------------------------------------------------------------------- |
 | `POST /tickets` (utökas)    | 201, ärendet. Skapar en `created`-post.                      | 422 vid ogiltig indata, då skapas varken ärende eller post               |
-| `PATCH /tickets/{id}/status` | 200, ärendet med ny status. Skapar en `status_changed`-post. | 404 okänt ärende (även id som inte är heltal) · 422 ogiltig status · 409 samma status som nuvarande |
+| `PATCH /tickets/{id}/status` | 200, ärendet med ny status. Skapar en `status_changed`-post. | 404 okänt ärende (även id som inte är heltal) · 422 ogiltig status · 409 samma status som nuvarande · 503 om historikposten inte kan sparas (inget ändras) |
 | `GET /tickets/{id}/history`  | 200, lista äldst först                                        | 404 okänt ärende (även id som inte är heltal)                            |
 
 **Anrop och svar**
@@ -158,6 +170,17 @@ valideringsfel. FastAPI:s standardsvar för 422 är en lista på engelska, så b
 registrerar en egen hanterare för `RequestValidationError` som översätter till formatet
 ovan (krävs för HIST-06 och HIST-14).
 
+**Felmeddelanden för statusändring och historik** (huvudversion i
+[API-konventioner](../api-konventioner.md), avsnitt 2):
+
+| Situation | HTTP | Meddelande |
+| --- | --- | --- |
+| Okänt ärende, eller id som inte är ett heltal | 404 | Ärendet finns inte. |
+| Okänd eller saknad status (t.ex. `"klar"`) | 422 | Välj en giltig status. |
+| Fel datatyp (t.ex. `{"status": 5}`), saknad kropp eller trasig JSON | 422 | Ogiltig indata. |
+| Samma status som nuvarande | 409 | Ärendet har redan den statusen. |
+| Historikposten kunde inte sparas (allt rullas tillbaka) | 503 | Statusen kunde inte ändras. Försök igen. |
+
 ## 6. Acceptanskriterier
 
 Varje kriterium har ett id som används i tester, commits och PR-beskrivningar.
@@ -176,6 +199,9 @@ HIST-06, 07 och 13 är statusregler, de övriga gäller historiken.
 - **HIST-04** Givet ett ärende med historik, när applikationen startas om, då är både
   status och historik oförändrade. "Omstart" betyder i testet en **ny engine och ny
   session mot samma databasfil**, inte samma session (annars syns osparade ändringar).
+  Den gamla engine stängs först (`dispose()`, annars kan SQLite-filen vara låst på Windows),
+  och kontrollen görs via API:t med en ny app-instans som läser databas-URL:en från
+  konfigurationen. "Oförändrade" betyder alla fält, även `id` och `occurred_at`.
 - **HIST-05** Givet ett ärende, när historiken visas i detaljvyn, då visas varje post med
   statusövergång (svenska etiketter) och tidpunkt i lokal tid, och senaste posten
   stämmer med ärendets aktuella status.
@@ -183,20 +209,25 @@ HIST-06, 07 och 13 är statusregler, de övriga gäller historiken.
 **Error paths**
 
 - **HIST-06** Givet en ogiltig status (`"klar"`), när statusändring försöks, då svarar
-  API:t 422 med ett begripligt svenskt meddelande, ärendets status är oförändrad och
+  API:t 422 med "Välj en giltig status.", ärendets status är oförändrad och
   ingen ny historikpost har skapats.
   Fel datatyp (t.ex. `{"status": 5}`) ger i stället bara "Ogiltig indata." (samma som B9 i CORE).
 - **HIST-07** Givet att ärendet redan har status `in_progress`, när samma status skickas,
-  då svarar API:t 409, och ingen historikpost skapas.
+  då svarar API:t 409 med "Ärendet har redan den statusen." och ingen historikpost skapas.
+  Det gäller alla fyra statusar, även ett nytt ärende som får `new` igen.
 - **HIST-08** Givet ett okänt ärende-id, när historik hämtas eller status ändras, då
   svarar API:t 404 med "Ärendet finns inte." och inget skapas. Samma gäller ett id som
   inte är ett heltal, t.ex. `GET /tickets/abc/history` och `PATCH /tickets/abc/status`
   (samma beslut som B8 i CORE-specen).
 - **HIST-09** Givet att skrivningen av historikposten misslyckas, när status ändras, då
   rullas statusändringen tillbaka och ärendet behåller sin gamla status (atomicitet).
+  API:t svarar 503 med "Statusen kunde inte ändras. Försök igen." utan tekniska detaljer
+  (samma statuskod som `/health` när databasen inte går att nå, se ADR-001).
+  Statusen är oförändrad även när databasfilen läses med en ny engine, och nästa
+  statusändring på samma ärende lyckas (sessionen lämnas inte trasig).
 - **HIST-10** Givet att ärendet inte kan skapas (t.ex. tom rubrik), när `POST` körs, då
-  finns ingen historikpost kvar. (Att inget *ärende* sparas prövas i CORE-06–09, 11–13
-  och 17. HIST-10 prövar bara historiken, så samma fall testas inte två gånger.)
+  finns ingen historikpost kvar. (Att inget *ärende* sparas prövas i CORE-06–09, 11–13,
+  17 och 18. HIST-10 prövar bara historiken, så samma fall testas inte två gånger.)
 
 **Gränsfall**
 
@@ -250,7 +281,8 @@ flowchart TB
 - Tjänsten får tiden från en **utbytbar klocka** (en funktion som skickas in), så att
   tester kan styra `occurred_at` (HIST-11).
 
-Hur atomiciteten garanteras beslutas i ADR-001 (`docs/decisions/`), som jämför
+Hur atomiciteten garanteras beslutas i
+[ADR-001](../decisions/ADR-001-atomicitet-status-och-historik.md), som jämför
 (a) transaktion i tjänstelagret, (b) databastrigger och (c) event sourcing.
 
 ## 8. Commands
@@ -283,13 +315,13 @@ python3.11 -m venv .venv
 bevakas hela `backend/`, även `.venv`, och servern kan starta om mitt i ett anrop när
 till exempel OneDrive synkar filer där.
 
-**Frontend** (från repots rotmapp, förslag tills frontend finns)
+**Frontend** (från repots rotmapp, pnpm enligt stackbeslutet)
 
 ```bash
 cd frontend
-npm install
-npm run dev                     # http://localhost:5173
-npm test                        # vitest
+pnpm install
+pnpm dev                        # http://localhost:5173, /api går till backend på 8010
+pnpm test                       # vitest (när testerna finns)
 ```
 
 **Port 8010.** Projektet körs på 8010, inte uvicorns standard 8000, eftersom 8000 ofta används av andra lokala appar. Kontrollera att `/health` svarar `{"status": "ok", "database": "ok"}`, inte bara 200: svarar något annat är det ett annat program på porten.
@@ -307,7 +339,7 @@ docs/{specs/, decisions/, status/, verifiering.md}
 
 | Nivå                                 | Vad                                                         | Verktyg                              | Täcker                                                        | Ansvarig             |
 | ------------------------------------- | ----------------------------------------------------------- | ------------------------------------ | -------------------------------------------------------------- | -------------------- |
-| Enhet                                 | Statusregler (samma status, giltiga värden, återöppning) | pytest                               | HIST-06, 07, 13                                                | Nicklas              |
+| Enhet och integration                 | Statusregler (samma status, giltiga värden, återöppning). Integrationstestet visar statuskoden och att ingen post finns i databasen | pytest, TestClient, temporär fil | HIST-06, 07, 13                                                | Nicklas              |
 | Integration (API + riktig SQLite-fil) | Hela kedjan router → service → databas                    | pytest + TestClient, temporär fil   | HIST-01–03, 08, 10–12                                        | Azalea               |
 | Integration, omstart                  | Ny engine mot samma fil                                     | pytest, temporär fil                | HIST-04                                                        | Azalea               |
 | Integration, fel injicerat            | Tvinga historikinsättning att kasta fel                    | pytest + monkeypatch                 | HIST-09                                                        | Azalea               |
@@ -329,6 +361,9 @@ fel med flit. Minst dessa tre prövas:
 | Historikinsättningen tas bort              | HIST-01, 02, 03 |
 | `commit` sker före historikinsättningen | HIST-09         |
 | `commit` tas bort (bara `flush`)        | HIST-04         |
+
+Fler mutationer får läggas till för samma krav, t.ex. att statusen sparas i en egen
+transaktion eller att felhanteringen sätter tillbaka en hårdkodad status (HIST-09).
 
 **Korsvis prövning.** Var och en prövar sina egna tester med mutationerna ovan (Azalea)
 respektive mutationer för statusreglerna och valideringen (Nicklas, t.ex. att 409-kontrollen
@@ -359,8 +394,8 @@ test → körresultat i `docs/verifiering.md`.
 | ------------------------------ | ---------------------------------------------------------------- |
 | 01 · Planning & Architecture  | Denna spec, CORE-specen, teknikbeslutet om stacken, ADR-001      |
 | 02 · Foundation & Database    | Skelett, SQLite, `/health`, körinstruktioner                  |
-| 03 · Case Management          | CORE-kriterierna (skapa, lista, visa, validera)                  |
-| 04 · Additional Feature       | HIST-01–14 (och ev. sök och filtrering)                        |
+| 03 · Case Management          | CORE-kriterierna (skapa, lista, visa, validera) och statusbytet: `PATCH /tickets/{id}/status` med statusreglerna (HIST-06, 07, 08, 13). Examinationen räknar "ändra status" till kärnan. |
+| 04 · Additional Feature       | Historiken: HIST-01–05, 09–12 och 14 (och ev. sök och filtrering) |
 | 05 · Testing & Verification   | Testerna per krav-id, mutationsprövningen, verifieringsplanen   |
 | 06 · Documentation & Delivery | Instruktion för testförslag, AI-arbetssätt, veckostatus, demo |
 

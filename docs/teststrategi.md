@@ -20,7 +20,7 @@
 
 | Nivå | Vad | Verktyg | Täcker | Ansvarig |
 | --- | --- | --- | --- | --- |
-| Enhet | Statusregler (samma status, giltiga värden, återöppning) | pytest | HIST-06, 07, 13 | Nicklas |
+| Enhet och integration | Statusregler (samma status, giltiga värden, återöppning). Integrationstestet visar statuskoden och att ingen post finns i databasen | pytest, TestClient, temporär fil | HIST-06, 07, 13 | Nicklas |
 | Enhet / integration | Validering i kärnan (obligatoriska fält, gränsvärden) | pytest + TestClient, Hypothesis för gränsvärden | CORE-kriterierna | Nicklas |
 | Integration (API + riktig SQLite-fil) | Hela kedjan router → service → databas | pytest + TestClient, temporär fil | HIST-01–03, 08, 10–12 | Azalea |
 | Integration, omstart | Ny engine och session mot samma fil | pytest, temporär fil | HIST-04 | Azalea |
@@ -52,11 +52,17 @@ rätt anledning.
 | `commit` sker före historikinsättningen | HIST-09 | Azalea |
 | `commit` tas bort (bara `flush`) | HIST-04 | Azalea |
 | 409-kontrollen för samma status tas bort | HIST-07 | Nicklas |
-| Tom rubrik accepteras | CORE (validering), HIST-10 | Nicklas |
+| Tom rubrik accepteras | CORE-06, CORE-11 | Nicklas |
 | Gränsen `<= 100` ändras till `< 100` | CORE-12 | Nicklas |
 
+Tabellen visar ett urval. Fler mutationer för kärnan finns i [CORE-specen](specs/SPEC-karna.md), avsnitt 6, och för historiken i [HIST-specen](specs/SPEC-arendehistorik.md), avsnitt 10.
+
+Var och en prövar bara **sina egna** tester i steg 1. Steg 1 görs och dokumenteras (körresultat
+i Verification-ärendet) innan steg 2 börjar, så att det syns vem som hittade vad.
+
 **Steg 2, korsvis.** Den andra lägger in en mutation som testförfattaren inte känner till i
-förväg. Testförfattaren visar vilket test som faller och varför.
+förväg. Testförfattaren visar vilket test som faller och varför. Mutationen i steg 2 är ett
+tillägg till steg 1, inte en ersättning.
 
 **Om ett test är grönt trots mutationen:** den som skrev testet förbättrar det och sparar
 före/efter.
@@ -67,10 +73,13 @@ Windows) kan komplettera för jämförelser och gränser. `mutmut` kräver WSL.
 
 ## 4. Instruktion för testförslag (AI)
 
-- **v1** skrivs av Nicklas och används av alla för att få testförslag från AI utifrån ett
-  krav-id.
+- **v1** ([`docs/ai/testforslag-v1.md`](ai/testforslag-v1.md)) skrivs av Nicklas och används av
+  alla för att få testförslag från AI utifrån ett krav-id.
 - Var och en gör sedan en **egen, namngiven förbättring** utifrån en begränsning hen hittat,
-  prövar den på sina egna kriterier och jämför med v1. Vi granskar varandras förbättringar.
+  prövar den på sina egna kriterier och jämför med v1. Vi granskar varandras förbättringar,
+  men skriver dem inte åt varandra.
+- **v1 ändras bara för fel och otydligheter.** Förbättringar läggs i den egna, namngivna
+  versionen och inte i v1, så att varje förbättring kan jämföras mot samma v1.
 - Varje användning sparas med förslaget, vad som accepterades, ändrades eller avvisades, och
   varför.
 
