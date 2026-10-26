@@ -34,7 +34,7 @@ En tabell, en rad per test:
 
 | Testnamn | Krav-id | Givet / När / Då | Förväntat resultat | Nivå | Ska falla om … |
 | --- | --- | --- | --- | --- | --- |
-| `test_core07_saknad_beskrivning_avvisas` | CORE-07 | Givet att beskrivning saknas, när ärendet skapas, då … | 422, `{"detail": "Beskrivning måste fyllas i."}`, inget ärende i databasen | Integration | valideringen av beskrivning tas bort |
+| `test_core07_missing_description_is_rejected` | CORE-07 | Givet att beskrivning saknas, när ärendet skapas, då … | 422, `{"detail": "Beskrivning måste fyllas i."}`, inget ärende i databasen | Integration | valideringen av beskrivning tas bort |
 
 Efter tabellen: en kort lista med **frågor** om något i specen är otydligt.
 

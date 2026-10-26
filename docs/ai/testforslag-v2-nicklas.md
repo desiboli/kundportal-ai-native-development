@@ -58,7 +58,7 @@ till att varje gräns i kravet testas på båda sidor, och att förslaget går s
 
 | Prio | Testnamn | Krav-id | Givet / När / Då | Förväntat resultat | Nivå | Ska falla om … |
 | --- | --- | --- | --- | --- | --- | --- |
-| Måste | `test_core12_rubrik_100_tecken_godkanns` | CORE-12 | Givet en rubrik på exakt 100 tecken, när ärendet skapas, då … | 201, ärendet sparas | Integration | gränsen ändras från `<= 100` till `< 100` |
+| Måste | `test_core12_title_100_chars_is_accepted` | CORE-12 | Givet en rubrik på exakt 100 tecken, när ärendet skapas, då … | 201, ärendet sparas | Integration | gränsen ändras från `<= 100` till `< 100` |
 
 3. **Frågor** om något i specen är otydligt.
 
