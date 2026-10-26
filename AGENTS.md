@@ -50,6 +50,8 @@ Frontend: se `frontend/README.md` (pnpm). Backend körs på **port 8010**, inte 
   innan merge. Alla konversationer i PR:en ska vara lösta.
 - **PR-referenser** skrivs med hel länk och beskrivning, t.ex.
   `PR #3 (backendskelett): https://github.com/desiboli/kundportal-ai-native-development/pull/3`.
+- **Engelska i koden:** namn och kommentarer på engelska, svenska bara i texter som
+  användaren ser och i felmeddelanden (`docs/api-konventioner.md`, avsnitt 4).
 - **Påhittade uppgifter**, aldrig riktiga kunduppgifter.
 - **Repot är huvudversion.** Gemensamma dokument ändras bara i repot, via PR. Linear används
   för planering (ärenden, milstolpar) och länkar hit.
