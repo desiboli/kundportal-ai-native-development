@@ -7,7 +7,7 @@ type Health =
   | { state: "ok"; database: string }
   | { state: "error"; message: string }
 
-// Hämtar /health via Vites proxy (se vite.config.ts) och översätter svaret till ett läge.
+// Fetches /health through the Vite proxy (see vite.config.ts) and maps the response to a state.
 async function fetchHealth(): Promise<Health> {
   try {
     const response = await fetch("/api/health")
@@ -15,7 +15,7 @@ async function fetchHealth(): Promise<Health> {
     if (response.ok) {
       return { state: "ok", database: data.database }
     }
-    // Backenden svarar alltid med {"detail": "<svenskt meddelande>"} vid fel.
+    // On errors the backend always responds with {"detail": "<Swedish message>"}.
     return { state: "error", message: data.detail ?? "Okänt fel." }
   } catch {
     return {

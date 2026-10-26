@@ -12,8 +12,8 @@ export default defineConfig({
     },
   },
   server: {
-    // Anrop till /api/... skickas vidare till backenden på port 8010 utan /api,
-    // så /api/health blir /health. Då behövs ingen CORS i backenden.
+    // Requests to /api/... are forwarded to the backend on port 8010 without /api,
+    // so /api/health becomes /health. This way the backend needs no CORS.
     proxy: {
       "/api": {
         target: "http://localhost:8010",
