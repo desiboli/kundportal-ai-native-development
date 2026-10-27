@@ -24,6 +24,8 @@ DESCRIPTION_REQUIRED = "Beskrivning måste fyllas i."
 INVALID_CATEGORY = "Välj en giltig kategori."
 INVALID_PRIORITY = "Välj en giltig prioritet."
 STATUS_NOT_ALLOWED = "Status sätts automatiskt och kan inte anges när ett ärende skapas."
+# HIST section 5: unknown or missing status.
+INVALID_STATUS = "Välj en giltig status."
 INVALID_INPUT = "Ogiltig indata."
 TICKET_NOT_FOUND = "Ärendet finns inte."
 PAGE_NOT_FOUND = "Sidan finns inte."
@@ -280,6 +282,14 @@ def test_hist14_patch_wrong_type_gives_invalid_input(client, body):
     assert_error(response, 422, INVALID_INPUT)
 
 
+def test_hist06_missing_status_gives_invalid_status(client):
+    """HIST-06 (unknown or missing status): a body without status gives "Välj en giltig status."."""
+    # Catches: a missing status read as a broken request (B9) and answered "Ogiltig indata.".
+    # A request with no body at all is still broken input, see the missing_body case above.
+    response = client.patch("/tickets/1/status", json={})
+    assert_error(response, 422, INVALID_STATUS)
+
+
 # (method, url, keyword arguments) for every error case above that uses the normal client.
 ERROR_CASES = [
     ("post", "/tickets", {"json": ticket_with(status="closed")}),
@@ -298,6 +308,7 @@ ERROR_CASES = [
     ("get", "/tickets/abc", {}),
     ("patch", "/tickets/abc/status", {"json": {"status": "klar"}}),
     ("patch", "/tickets/1/status", {"json": {"status": 5}}),
+    ("patch", "/tickets/1/status", {"json": {}}),
     ("get", "/tiketts", {}),
     ("delete", "/tickets/1", {}),
 ]
