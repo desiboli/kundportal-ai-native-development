@@ -204,12 +204,9 @@ def test_error_responses_are_declared_with_detail(openapi, method, path, status)
     assert schema["required"] == ["detail"]
 
 
-# A valid body, so that POST reaches the stub instead of failing validation.
-VALID_TICKET = {"title": "Fakturan har fel belopp", "description": "Dubbel debitering.", "category": "billing", "priority": "high"}
-
-# (method, real URL with id 1, body) for each stub.
+# (method, real URL with id 1, body) for each stub. POST /tickets was removed in KSP-22,
+# where it is replaced by the behaviour tests in test_create_ticket.py.
 STUB_CALLS = [
-    ("post", "/tickets", VALID_TICKET),
     ("get", "/tickets", None),
     ("get", "/tickets/1", None),
     ("patch", "/tickets/1/status", {"status": "in_progress"}),
