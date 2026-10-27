@@ -1,6 +1,6 @@
 # Veckostatus vecka 6: det centrala flödet
 
-> Senast uppdaterat tisdag 2026-10-27 eftermiddag (Azalea).
+> Senast uppdaterat tisdag 2026-10-27 kväll (Azalea).
 > Jämför med veckans förväntningar i Disco. Id förklaras kort: **KSP-xx** är ärenden i
 > [Linear: Kundserviceportalen](https://linear.app/grupp6/project/kundserviceportalen-be4a4840b5ef),
 > **CORE-xx** är kraven för kärnan ([SPEC-karna.md](../specs/SPEC-karna.md)) och **HIST-xx**
@@ -36,7 +36,8 @@ Teamets plan för veckan (milstolpe 03 Case Management i Linear):
 | Frontenden når backendens `/health` via Vite-proxyn (`/api` → port 8010). Startsidan visar om backenden och databasen svarar | Azalea | PR #15 (koppla frontend till backendens /health): https://github.com/desiboli/kundportal-ai-native-development/pull/15 · mergad 2026-10-26 |
 | Veckostatus V6 | Azalea | PR #27 (veckostatus V6): https://github.com/desiboli/kundportal-ai-native-development/pull/27 · mergad 2026-10-27 |
 | Ny regel i AGENTS.md (teamets regler för AI-verktyg): varje id förklaras kort, i AI-svar, commits, PR:er, dokument och kod (KSP-10, teamets AI-arbetssätt) | Azalea | PR #29 (AGENTS.md, förklara varje krav-id kort): https://github.com/desiboli/kundportal-ai-native-development/pull/29 · mergad 2026-10-27 |
-| Svenskt felformat i backenden: alla fel är `{"detail": "<svenskt meddelande>"}` utan stacktrace, SQL eller engelska fältnamn (CORE-16, HIST-14). Fältfel i fältordningen (CORE-18), "Ogiltig indata." för fel datatyp, trasig JSON och ogiltig UTF-8 (CORE-17), 404 "Ärendet finns inte." för id som inte är heltal (CORE-10), svenska 404, 405 och 500. Byggt som teamets första agentuppdrag, med fyra kontrollpunkter där Azalea godkände varje steg (KSP-21) | Azalea (med AI-agent) | PR #30 (svenskt felformat i backenden): https://github.com/desiboli/kundportal-ai-native-development/pull/30 · öppen, granskare Nicklas |
+| Svenskt felformat i backenden: alla fel är `{"detail": "<svenskt meddelande>"}` utan stacktrace, SQL eller engelska fältnamn (CORE-16, HIST-14). Fältfel i fältordningen (CORE-18), "Ogiltig indata." för fel datatyp, trasig JSON och ogiltig UTF-8 (CORE-17), 404 "Ärendet finns inte." för id som inte är heltal (CORE-10), svenska 404, 405 och 500. Byggt som teamets första agentuppdrag, med fyra kontrollpunkter där Azalea godkände varje steg (KSP-21) | Azalea (med AI-agent) | PR #30 (svenskt felformat i backenden): https://github.com/desiboli/kundportal-ai-native-development/pull/30 · godkänd av Nicklas, mergad 2026-10-27 |
+| Saknad status i statusbytet (`PATCH` med `{}`) ger "Välj en giltig status." enligt HIST-06 (okänd eller saknad status). Ett anrop helt utan kropp ger fortfarande "Ogiltig indata." (B9). Hittat av Nicklas i granskningen av PR #30 | Azalea | PR #32 (saknad status i PATCH ger "Välj en giltig status."): https://github.com/desiboli/kundportal-ai-native-development/pull/32 · öppen, granskare Nicklas |
 
 ## Verifierat
 
@@ -59,6 +60,10 @@ Teamets plan för veckan (milstolpe 03 Case Management i Linear):
   inte.", `{"title": 5}`, trasig JSON och ogiltig UTF-8 gav 422 "Ogiltig indata.", `GET /tiketts`
   gav 404 "Sidan finns inte." och `DELETE /tickets/1` gav 405 "Metoden stöds inte.".
 
+- HIST-06, saknad status: testet `test_hist06_missing_status_gives_invalid_status` skrevs först
+  och föll av rätt anledning ("Ogiltig indata." i stället för "Välj en giltig status."):
+  `1 failed, 81 passed`. Efter rättningen: `82 passed`.
+
 ## Osäkert eller ofärdigt
 
 | Vad | Varför | Plan |
@@ -75,7 +80,7 @@ Teamets plan för veckan (milstolpe 03 Case Management i Linear):
 | Vad | Ansvarig |
 | --- | --- |
 | Teammöte tisdag 2026-10-27: openapi-typescript, ordningen för CORE-testerna | Alla |
-| Granska PR #30 (svenskt felformat i backenden): https://github.com/desiboli/kundportal-ai-native-development/pull/30 | Nicklas |
+| Granska PR #32 (saknad status i PATCH ger "Välj en giltig status."): https://github.com/desiboli/kundportal-ai-native-development/pull/32 | Nicklas |
 | Bestämma hur FastAPI:s engelska 422 (`HTTPValidationError`) tas bort ur `/openapi.json` | Mustafa och Azalea |
 | Ärendemodell och `POST /tickets` med validering och trimning | Azalea (KSP-22) |
 | Generera TypeScript-typer från `/openapi.json` (kontraktet är mergat, inget blockerar längre) | Mustafa (KSP-28) |
