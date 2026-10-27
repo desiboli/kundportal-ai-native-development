@@ -39,6 +39,10 @@ Frontend: se `frontend/README.md` (pnpm). Backend körs på **port 8010**, inte 
 - **Läs rätt spec först.** Varje ändring utgår från ett krav-id (`CORE-xx` eller `HIST-xx`).
 - **Testförslag från AI** tas fram enligt instruktionen i `docs/ai/` (t.ex. *"Föreslå tester för CORE-07 enligt docs/ai/testforslag-v1.md"*) och granskas innan testkoden skrivs.
 - **Krav-id i allt:** i testets namn eller docstring, i commit-meddelandet och i PR:en.
+- **Förklara varje id kort**, aldrig ett naket `KSP-xx` (ärende i Linear), `CORE-xx`, `HIST-xx`
+  eller `Bx` (beslut i en spec). Skriv några ord om vad det gäller, t.ex. "CORE-10 (okänt
+  ärende ger 404)". Gäller svar från AI, commits, PR:er, Slack, dokument och kod. I koden
+  på engelska: `# CORE-10: unknown ticket or non-integer id gives 404`.
 - **Testerna först:** skriv eller ändra testet, se det falla av rätt anledning, bygg sedan.
 - **Kör testerna före varje commit.** CI kör dem igen på varje PR.
 - **Felformat:** alla fel är `{"detail": "<begripligt svenskt meddelande>"}`, aldrig
