@@ -7,6 +7,7 @@ from sqlalchemy.orm import sessionmaker
 from app.api import health, tickets
 from app.config import database_url_from_env
 from app.db import Base, ensure_sqlite_directory
+from app.errors import register_error_handlers
 
 
 def create_app(database_url: str | None = None) -> FastAPI:
@@ -22,6 +23,8 @@ def create_app(database_url: str | None = None) -> FastAPI:
 
     app = FastAPI(title="Kundserviceportalen", lifespan=lifespan)
     app.state.session_factory = sessionmaker(engine)
+    # Every error as {"detail": "<Swedish message>"} (KSP-21, CORE-16, HIST-14).
+    register_error_handlers(app)
     app.include_router(health.router)
     app.include_router(tickets.router)
     return app
