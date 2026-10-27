@@ -35,7 +35,7 @@ av kravet är grönt) · *Grönt* · *Verifierat* (alla fyra punkterna i avsnitt
 | CORE-07 | Beskrivning saknas | `test_error_format.py` (felsvaret) | Integration | Nej | Delvis: att inget sparas prövas i KSP-22 |
 | CORE-08 | Okänd kategori eller prioritet | `test_error_format.py` (felsvaret) | Integration | Nej | Delvis: att inget sparas prövas i KSP-22 |
 | CORE-09 | `status` skickas vid skapande | `test_error_format.py` | Integration | Nej | Delvis: att inget sparas prövas i KSP-22 |
-| CORE-10 | Okänt id eller id som inte är heltal ger 404 | `test_error_format.py` (id som inte är heltal) | Integration | Nej | Delvis: okänt heltals-id när KSP-22 finns |
+| CORE-10 | Okänt id eller id som inte är heltal ger 404 | `test_error_format.py` (id som inte är heltal) | Integration | Nej | Delvis: okänt heltals-id när KSP-23 finns |
 | CORE-11 | Bara blanktecken eller osynliga tecken | – | Integration | Ja | Ej påbörjad |
 | CORE-12 | Rubrik högst 100 tecken, efter trimning | – | Integration | Ja | Ej påbörjad |
 | CORE-13 | Beskrivning högst 2000 tecken | – | Integration | Nej | Ej påbörjad |
@@ -58,7 +58,7 @@ https://github.com/desiboli/kundportal-ai-native-development/pull/30.
 | HIST-03 | Historiken äldst först | – | Azalea | Ja | Ej påbörjad |
 | HIST-04 | Historiken finns kvar efter omstart | – | Azalea | Ja | Ej påbörjad |
 | HIST-05 | Tidslinjen i detaljvyn | – | Amalia | Ja | Ej påbörjad |
-| HIST-06 | Ogiltig status ger 422 | – | Nicklas | Nej | Ej påbörjad |
+| HIST-06 | Ogiltig status ger 422 | `test_error_format.py` (saknad status och fel datatyp) | Nicklas | Nej | Delvis: resten skrivs i KSP-27 |
 | HIST-07 | Samma status ger 409 | – | Nicklas | Nej | Ej påbörjad |
 | HIST-08 | Okänt ärende ger 404 | – | Azalea | Nej | Ej påbörjad |
 | HIST-09 | Inget ändras om historikposten inte kan sparas | – | Azalea | Nej | Ej påbörjad |
@@ -98,6 +98,9 @@ avsnitt 4 med "för hand" i kolumnen Typ.
 ## 4. Körresultat
 
 En rad per körning. Minst en gång i veckan och före slutleveransen. Linear-ärendena länkar hit.
+Commit skrivs som en hel länk, t.ex.
+`https://github.com/desiboli/kundportal-ai-native-development/commit/<hash>`, så att det går
+att klicka sig till exakt den version som kördes.
 
 | Datum | Commit | Typ | Resultat | Körd av |
 | --- | --- | --- | --- | --- |
