@@ -55,8 +55,10 @@ FIELD_MESSAGES = {
     # POST /tickets forbids status (CORE-09). Other unknown fields are not listed, so they
     # give "Ogiltig indata." (decided 2026-10-27).
     ("status", "extra_forbidden"): STATUS_NOT_ALLOWED,
-    # PATCH /tickets/{id}/status with an unknown status code (HIST-06).
+    # PATCH /tickets/{id}/status with an unknown or missing status code (HIST-06, HIST
+    # section 5). A request with no body at all is still broken input (B9).
     ("status", "enum"): INVALID_STATUS,
+    ("status", "missing"): INVALID_STATUS,
 }
 
 # Starlette's own errors that carry an English default text, by status code.

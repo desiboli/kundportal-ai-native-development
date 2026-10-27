@@ -1,6 +1,6 @@
 # Veckostatus vecka 6: det centrala flödet
 
-> Senast uppdaterat tisdag 2026-10-27 eftermiddag (Azalea).
+> Senast uppdaterat tisdag 2026-10-27 kväll (Azalea).
 > Jämför med veckans förväntningar i Disco. Id förklaras kort: **KSP-xx** är ärenden i
 > [Linear: Kundserviceportalen](https://linear.app/grupp6/project/kundserviceportalen-be4a4840b5ef),
 > **CORE-xx** är kraven för kärnan ([SPEC-karna.md](../specs/SPEC-karna.md)) och **HIST-xx**
@@ -36,7 +36,9 @@ Teamets plan för veckan (milstolpe 03 Case Management i Linear):
 | Frontenden når backendens `/health` via Vite-proxyn (`/api` → port 8010). Startsidan visar om backenden och databasen svarar | Azalea | PR #15 (koppla frontend till backendens /health): https://github.com/desiboli/kundportal-ai-native-development/pull/15 · mergad 2026-10-26 |
 | Veckostatus V6 | Azalea | PR #27 (veckostatus V6): https://github.com/desiboli/kundportal-ai-native-development/pull/27 · mergad 2026-10-27 |
 | Ny regel i AGENTS.md (teamets regler för AI-verktyg): varje id förklaras kort, i AI-svar, commits, PR:er, dokument och kod (KSP-10, teamets AI-arbetssätt) | Azalea | PR #29 (AGENTS.md, förklara varje krav-id kort): https://github.com/desiboli/kundportal-ai-native-development/pull/29 · mergad 2026-10-27 |
-| Svenskt felformat i backenden: alla fel är `{"detail": "<svenskt meddelande>"}` utan stacktrace, SQL eller engelska fältnamn (CORE-16, HIST-14). Fältfel i fältordningen (CORE-18), "Ogiltig indata." för fel datatyp, trasig JSON och ogiltig UTF-8 (CORE-17), 404 "Ärendet finns inte." för id som inte är heltal (CORE-10), svenska 404, 405 och 500. Byggt som teamets första agentuppdrag, med fyra kontrollpunkter där Azalea godkände varje steg (KSP-21) | Azalea (med AI-agent) | PR #30 (svenskt felformat i backenden): https://github.com/desiboli/kundportal-ai-native-development/pull/30 · öppen, granskare Nicklas |
+| Svenskt felformat i backenden: alla fel är `{"detail": "<svenskt meddelande>"}` utan stacktrace, SQL eller engelska fältnamn (CORE-16, HIST-14). Fältfel i fältordningen (CORE-18), "Ogiltig indata." för fel datatyp, trasig JSON och ogiltig UTF-8 (CORE-17), 404 "Ärendet finns inte." för id som inte är heltal (CORE-10), svenska 404, 405 och 500. Byggt som teamets första agentuppdrag, med fyra kontrollpunkter där Azalea godkände varje steg (KSP-21) | Azalea (med AI-agent) | PR #30 (svenskt felformat i backenden): https://github.com/desiboli/kundportal-ai-native-development/pull/30 · godkänd av Nicklas, mergad 2026-10-27 |
+| Saknad status i statusbytet (`PATCH` med `{}`) ger "Välj en giltig status." enligt HIST-06 (okänd eller saknad status). Ett anrop helt utan kropp ger fortfarande "Ogiltig indata." (B9). Hittat av Nicklas i granskningen av PR #30 | Azalea | PR #32 (saknad status i PATCH ger "Välj en giltig status."): https://github.com/desiboli/kundportal-ai-native-development/pull/32 · öppen, granskare Nicklas |
+| Registrera ärenden: `POST /tickets` sparar i SQLite med status `new` och tid i UTC (CORE-01, giltigt ärende ger 201). Rubrik och beskrivning trimmas i ändarna, även nollbreddstecken (CORE-05, B10, B12), en rubrik med bara blanktecken räknas som tom (CORE-11), och längden räknas efter trimning (CORE-12, max 100 tecken). Tabellen `tickets`, TicketRepository och TicketService enligt lagren i arkitekturen (KSP-22) | Azalea | PR #34 (ärendemodell och POST /tickets med trimning): https://github.com/desiboli/kundportal-ai-native-development/pull/34 · öppen, granskare Nicklas, Amalia och Mustafa |
 
 ## Verifierat
 
@@ -59,6 +61,18 @@ Teamets plan för veckan (milstolpe 03 Case Management i Linear):
   inte.", `{"title": 5}`, trasig JSON och ogiltig UTF-8 gav 422 "Ogiltig indata.", `GET /tiketts`
   gav 404 "Sidan finns inte." och `DELETE /tickets/1` gav 405 "Metoden stöds inte.".
 
+- HIST-06, saknad status: testet `test_hist06_missing_status_gives_invalid_status` skrevs först
+  och föll av rätt anledning ("Ogiltig indata." i stället för "Välj en giltig status."):
+  `1 failed, 81 passed`. Efter rättningen: `82 passed`.
+- KSP-22 (ärendemodell och `POST /tickets`), testerna först: tio egna tester (21 fall) i
+  `backend/tests/test_create_ticket.py`, enligt testinstruktionen v1. De läser SQLite-filen direkt
+  för att se vad som sparades. Commit `99638a4` (bara testerna): `21 failed, 80 passed`.
+  Commit `33600e8` (koden): `100 passed`. Två tester som byggde på stubbens 501 för `POST` är
+  ändrade som PR #26 beskrev, godkänt av Azalea.
+- KSP-22, manuellt på port 8010 med en tillfällig databas: mellanslag och U+200B trimmas,
+  en rubrik med bara U+200B, mellanslag och tabb ger 422 "Rubrik måste fyllas i.", 100 tecken
+  med mellanslag runt ger 201, och `status` ger 422.
+
 ## Osäkert eller ofärdigt
 
 | Vad | Varför | Plan |
@@ -66,7 +80,7 @@ Teamets plan för veckan (milstolpe 03 Case Management i Linear):
 | FastAPI lägger själv till en engelsk 422 (`HTTPValidationError`) på `GET /tickets/{ticket_id}` och `/history` | Vägar med en parameter får den automatiskt. Den stämmer inte med CORE-10 (404 för id som inte är heltal) och CORE-16 | Inte rättat i KSP-21: API:t svarar nu 404, men `/openapi.json` deklarerar fortfarande den engelska 422:an (även på `PATCH /tickets/{ticket_id}/status`). Att ta bort den ändrar kontraktet, så frågan ligger hos Mustafa i PR #30 (svenskt felformat i backenden): https://github.com/desiboli/kundportal-ai-native-development/pull/30 |
 | 503 för databasfel i svenskt felformat (AC3 i KSP-21) | Det finns ingen databaskod att testa mot än | Byggs i KSP-34 (TicketService) eller KSP-36 (HIST-09) |
 | 501-testerna i PR #26 (API-kontraktet i OpenAPI med fem stubbar): https://github.com/desiboli/kundportal-ai-native-development/pull/26 är tillfälliga | Varje stubb byts mot riktig logik | Ersätts av beteendetester i det KSP-ärende som bygger vägen |
-| `max_length` på rubrik och beskrivning kontrolleras före trimningen (Nicklas granskning av PR #26 (API-kontraktet i OpenAPI med fem stubbar): https://github.com/desiboli/kundportal-ai-native-development/pull/26) | CORE-12 och B10 säger att längden räknas efter trimning, så 100 tecken med mellanslag runt ska godkännas | Rättas i KSP-22 tillsammans med trimningen (ingick inte i KSP-21). Nicklas lägger fallet i CORE-testerna (KSP-25) |
+| `max_length` på rubrik och beskrivning kontrolleras före trimningen (Nicklas granskning av PR #26 (API-kontraktet i OpenAPI med fem stubbar): https://github.com/desiboli/kundportal-ai-native-development/pull/26) | CORE-12 och B10 säger att längden räknas efter trimning, så 100 tecken med mellanslag runt ska godkännas | Rättat i PR #34 (ärendemodell och POST /tickets med trimning): https://github.com/desiboli/kundportal-ai-native-development/pull/34, med test (`test_core12_100_chars_after_trim_is_accepted`) |
 | Ska andra okända fält än `status` avvisas i `POST /tickets`? (`extra="forbid"`) | CORE-09 gäller bara `status` | Azalea beslutade 2026-10-27: ja, andra okända fält ger bara "Ogiltig indata." (byggt i KSP-21). Nicklas bekräftar i granskningen av PR #30 (svenskt felformat i backenden): https://github.com/desiboli/kundportal-ai-native-development/pull/30 och lägger det i så fall i CORE-specen |
 | `docs/ansvar-och-granskning.md` har kvar rader med "Förslag" | Ansvaret bekräftades på teammötet 2026-10-25 | Azalea (KSP-13) |
 
@@ -75,9 +89,11 @@ Teamets plan för veckan (milstolpe 03 Case Management i Linear):
 | Vad | Ansvarig |
 | --- | --- |
 | Teammöte tisdag 2026-10-27: openapi-typescript, ordningen för CORE-testerna | Alla |
-| Granska PR #30 (svenskt felformat i backenden): https://github.com/desiboli/kundportal-ai-native-development/pull/30 | Nicklas |
+| Granska PR #32 (saknad status i PATCH ger "Välj en giltig status."): https://github.com/desiboli/kundportal-ai-native-development/pull/32 | Nicklas |
 | Bestämma hur FastAPI:s engelska 422 (`HTTPValidationError`) tas bort ur `/openapi.json` | Mustafa och Azalea |
-| Ärendemodell och `POST /tickets` med validering och trimning | Azalea (KSP-22) |
+| Granska PR #34 (ärendemodell och POST /tickets med trimning): https://github.com/desiboli/kundportal-ai-native-development/pull/34 | Nicklas (backend), Amalia och Mustafa (frontend) |
+| Lägga till "och ärendet sparas" i CORE-01 (giltigt ärende ger 201) | Nicklas |
+| Lista och visa ärenden: `GET /tickets` och `GET /tickets/{id}` (CORE-03, CORE-04) | Azalea (KSP-23) |
 | Generera TypeScript-typer från `/openapi.json` (kontraktet är mergat, inget blockerar längre) | Mustafa (KSP-28) |
 | Länka vecka 6 och de nya dokumenten (CORE-specen, ADR:erna, `docs/ai/`) från den löpande PR:n (Technigo#2): https://github.com/Technigo/kundportal-ai-native-development/pull/2 | Mustafa (KSP-56) |
 | Ansvarsdokumentet från "Förslag" till "Bekräftat" | Azalea (KSP-13) |
