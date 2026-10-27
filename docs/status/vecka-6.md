@@ -1,6 +1,6 @@
 # Veckostatus vecka 6: det centrala flödet
 
-> Senast uppdaterat måndag 2026-10-26 kväll (Azalea).
+> Senast uppdaterat tisdag 2026-10-27 morgon (Azalea).
 > Jämför med veckans förväntningar i Disco. Id förklaras kort: **KSP-xx** är ärenden i
 > [Linear: Kundserviceportalen](https://linear.app/grupp6/project/kundserviceportalen-be4a4840b5ef),
 > **CORE-xx** är kraven för kärnan ([SPEC-karna.md](../specs/SPEC-karna.md)) och **HIST-xx**
@@ -32,7 +32,9 @@ Teamets plan för veckan (milstolpe 03 Case Management i Linear):
 
 | Vad | Vem | Länk |
 | --- | --- | --- |
-| API-kontraktet: alla fem endpoints för CORE och HIST i `/openapi.json` med modeller, enum, längdgränser och felsvar. Stubbarna svarar 501 "Funktionen är inte klar än." | Azalea | PR #26 (API-kontraktet i OpenAPI med fem stubbar): https://github.com/desiboli/kundportal-ai-native-development/pull/26 · öppen, granskare Mustafa, Amalia och Nicklas |
+| API-kontraktet: alla fem endpoints för CORE och HIST i `/openapi.json` med modeller, enum, längdgränser och felsvar. Stubbarna svarar 501 "Funktionen är inte klar än." | Azalea | PR #26 (API-kontraktet i OpenAPI med fem stubbar): https://github.com/desiboli/kundportal-ai-native-development/pull/26 · mergad 2026-10-27 |
+| Frontenden når backendens `/health` via Vite-proxyn (`/api` → port 8010). Startsidan visar om backenden och databasen svarar | Azalea | PR #15 (koppla frontend till backendens /health): https://github.com/desiboli/kundportal-ai-native-development/pull/15 · mergad 2026-10-26 |
+| Veckostatus V6 | Azalea | PR #27 (veckostatus V6): https://github.com/desiboli/kundportal-ai-native-development/pull/27 · mergad 2026-10-27 |
 
 ## Verifierat
 
@@ -40,21 +42,30 @@ Teamets plan för veckan (milstolpe 03 Case Management i Linear):
   skrevs före koden. Commit `abede58` (bara testerna): `30 failed, 4 passed`, eftersom
   vägarna och modellerna saknades. Commit `dcaa890` (koden): `34 passed`. CI (jobbet
   `backend`) grön på PR #26 (API-kontraktet i OpenAPI med fem stubbar): https://github.com/desiboli/kundportal-ai-native-development/pull/26.
+- KSP-20, granskningen: Nicklas (backend) läste kontraktet mot CORE avsnitt 4 och HIST
+  avsnitt 4–5 och körde testerna lokalt (34 passed). Amalia kontrollerade fälten och
+  felsvaren för detaljvy, statusbyte och tidslinje och körde backenden (`/docs`, 501).
+  Mustafa kontrollerade att modellerna räcker för lista, formulär, detaljvy och statusbyte.
+  Alla tre godkände.
+- KSP-16, granskningen: Mustafa begärde ändringar på PR #15 (koppla frontend till backendens /health): https://github.com/desiboli/kundportal-ai-native-development/pull/15.
+  De gjordes, och Amalia och Mustafa godkände.
 
 ## Osäkert eller ofärdigt
 
 | Vad | Varför | Plan |
 | --- | --- | --- |
 | FastAPI lägger själv till en engelsk 422 (`HTTPValidationError`) på `GET /tickets/{ticket_id}` och `/history` | Vägar med en parameter får den automatiskt. Den stämmer inte med CORE-10 (404 för id som inte är heltal) och CORE-16 | Rättas i KSP-21 tillsammans med felformatet |
-| 501-testerna i PR #26 (API-kontraktet i OpenAPI med fem stubbar): https://github.com/desiboli/kundportal-ai-native-development/pull/26 är tillfälliga | Varje stubb byts mot riktig logik | Ersätts av beteendetester i det KSP-ärende som bygger vägen. Godkänns tillsammans med PR #26 |
-| PR #15 (koppla frontend till backendens /health): https://github.com/desiboli/kundportal-ai-native-development/pull/15 är blockerad | Mustafa begärde ändringar. De är gjorda och trådarna lösta | Mustafa granskar igen |
+| 501-testerna i PR #26 (API-kontraktet i OpenAPI med fem stubbar): https://github.com/desiboli/kundportal-ai-native-development/pull/26 är tillfälliga | Varje stubb byts mot riktig logik | Ersätts av beteendetester i det KSP-ärende som bygger vägen |
+| `max_length` på rubrik och beskrivning kontrolleras före trimningen (Nicklas granskning av PR #26 (API-kontraktet i OpenAPI med fem stubbar): https://github.com/desiboli/kundportal-ai-native-development/pull/26) | CORE-12 och B10 säger att längden räknas efter trimning, så 100 tecken med mellanslag runt ska godkännas | Rättas i KSP-21/KSP-22. Nicklas lägger fallet i CORE-testerna (KSP-25) |
+| Ska andra okända fält än `status` avvisas i `POST /tickets`? (`extra="forbid"`) | CORE-09 gäller bara `status` | Azalea och Nicklas bestämmer. Om ja, lägger Nicklas det i CORE-specen |
+| `docs/ansvar-och-granskning.md` har kvar rader med "Förslag" | Ansvaret bekräftades på teammötet 2026-10-25 | Azalea (KSP-13) |
 
 ## Nästa steg
 
 | Vad | Ansvarig |
 | --- | --- |
-| Granska PR #26 (API-kontraktet i OpenAPI med fem stubbar): https://github.com/desiboli/kundportal-ai-native-development/pull/26 | Mustafa och Amalia (kontraktet), Nicklas (backend) |
-| Godkänna PR #15 (koppla frontend till backendens /health): https://github.com/desiboli/kundportal-ai-native-development/pull/15 igen | Mustafa |
 | Teammöte tisdag 2026-10-27: openapi-typescript, ordningen för CORE-testerna | Alla |
 | Svenskt felformat i backenden | Azalea (KSP-21) |
-| Generera TypeScript-typer från `/openapi.json` | Mustafa (KSP-28) |
+| Generera TypeScript-typer från `/openapi.json` (kontraktet är mergat, inget blockerar längre) | Mustafa (KSP-28) |
+| Länka vecka 6 och de nya dokumenten (CORE-specen, ADR:erna, `docs/ai/`) från den löpande PR:n (Technigo#2): https://github.com/Technigo/kundportal-ai-native-development/pull/2 | Mustafa (KSP-56) |
+| Ansvarsdokumentet från "Förslag" till "Bekräftat" | Azalea (KSP-13) |
