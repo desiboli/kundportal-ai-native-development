@@ -6,9 +6,10 @@ missing body, broken JSON or invalid UTF-8 gives only "Ogiltig indata."), CORE-1
 errors are joined in field order) and the backend part of HIST-14 (same error format for
 status and history).
 
-The endpoints are still stubs that answer 501, so a request that passes validation gets
-501. That is how these tests show that valid input is let through. "No ticket is saved"
-is tested in KSP-22, when the table exists. Trimming (B10, B12) is also KSP-22.
+Most endpoints are still stubs that answer 501, so a request that passes validation gets
+501. That is how these tests show that valid input is let through. POST /tickets is built
+since KSP-22 and answers 201. "No ticket is saved" and trimming (B10, B12) are tested in
+test_create_ticket.py (KSP-22).
 """
 
 import pytest
@@ -80,8 +81,9 @@ def assert_error(response, status_code, detail):
 
 def test_core18_valid_body_passes_validation(client):
     """CORE-18 happy path: a valid body is not turned into a 422 by the error handler."""
-    # Catches: a handler that answers 422 for every request. 501 means the stub was reached.
-    assert_error(client.post("/tickets", json=VALID_TICKET), 501, NOT_IMPLEMENTED)
+    # Catches: a handler that answers 422 for every request. Since KSP-22 a valid body is
+    # created (201); before that, 501 from the stub showed the same thing.
+    assert client.post("/tickets", json=VALID_TICKET).status_code == 201
 
 
 def test_core09_status_in_create_is_rejected(client):

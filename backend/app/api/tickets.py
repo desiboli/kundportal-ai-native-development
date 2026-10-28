@@ -1,14 +1,20 @@
-"""Endpoints for tickets and their history (KSP-20).
+"""Endpoints for tickets and their history (contract in KSP-20).
 
-The five endpoints from CORE section 4 and HIST section 5 exist here so that the
-contract is complete in /openapi.json before any logic is built. Each one is a stub
-that answers 501 until the KSP issue that builds it replaces the body:
-POST and GET /tickets in KSP-22 to KSP-24, status change and history in KSP-33 to KSP-35.
+The five endpoints from CORE section 4 and HIST section 5 have been in /openapi.json
+since KSP-20. The ones not built yet are stubs that answer 501 until the KSP issue that
+builds them replaces the body. Built: POST /tickets (KSP-22, create a ticket).
+Still stubs: GET /tickets and GET /tickets/{id} (KSP-23, list and show), the status
+change (KSP-24) and the history (KSP-35).
 """
 
-from fastapi import APIRouter, HTTPException, status
+from typing import Annotated
 
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+
+from app.db import get_session
 from app.schemas.tickets import ErrorResponse, HistoryEntry, StatusChange, Ticket, TicketCreate
+from app.services.tickets import TicketService
 
 # Shown if the frontend calls an endpoint that is not built yet (KSP-20 decision 4).
 NOT_IMPLEMENTED = "Funktionen är inte klar än."
@@ -33,9 +39,15 @@ def _not_implemented():
 
 # response_model sets the success body in the schema, and status_code its HTTP code.
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=Ticket, responses=_error(422))
-def create_ticket(ticket: TicketCreate):
-    """Create a ticket with status "new" (CORE-01). Built in KSP-22."""
-    _not_implemented()
+def create_ticket(ticket: TicketCreate, session: Annotated[Session, Depends(get_session)]):
+    """Create a ticket with status "new" (CORE-01). Built in KSP-22.
+
+    Validation and trimming are done by TicketCreate before this runs, so a 422 never
+    reaches the service and nothing is saved (AC5 in KSP-22).
+    """
+    row = TicketService(session).create(ticket)
+    # The row is a SQLAlchemy object, so it is read through its attributes.
+    return Ticket.model_validate(row, from_attributes=True)
 
 
 @router.get("", response_model=list[Ticket])

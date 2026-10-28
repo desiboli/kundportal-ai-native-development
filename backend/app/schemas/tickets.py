@@ -10,7 +10,11 @@ Specs: CORE section 4 (tickets), HIST sections 4-5 (status change and history).
 
 from enum import StrEnum
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+# B10: invisible zero-width characters that str.strip() keeps but are trimmed anyway,
+# since a title that looks empty to the user should count as empty (CORE-11).
+ZERO_WIDTH_CHARS = "​‌‍⁠﻿"
 
 # Fixed UTC format with microseconds always present, so that sorting as text works
 # (HIST assumption 3, HIST-11). Kept as str because Pydantic's datetime drops zero
@@ -62,11 +66,30 @@ class TicketCreate(BaseModel):
     # to "new" (CORE-09). In the schema this becomes additionalProperties: false.
     model_config = ConfigDict(extra="forbid")
 
-    # Length limits in characters (code points), from CORE-12 and CORE-13.
+    # Length limits in characters (code points), from CORE-12 and CORE-13. They are
+    # checked after the trimming below, since a "before" validator runs first.
     title: str = Field(min_length=1, max_length=100)
     description: str = Field(min_length=1, max_length=2000)
     category: Category
     priority: Priority
+
+    @field_validator("title", "description", mode="before")
+    @classmethod
+    def trim_ends(cls, value):
+        """CORE-05, B10, B12: trim whitespace and zero-width characters at the ends only.
+
+        Characters inside the text are kept and counted, and the text is not normalised
+        (B12), so the saved text is exactly the text that was counted. A value that is not
+        a string is left alone, so it still fails as a wrong type ("Ogiltig indata.", B9).
+        """
+        if not isinstance(value, str):
+            return value
+        # Repeat until nothing changes, since the two kinds can be mixed, e.g. " ​ ".
+        previous = None
+        while value != previous:
+            previous = value
+            value = value.strip().strip(ZERO_WIDTH_CHARS)
+        return value
 
 
 class Ticket(BaseModel):
