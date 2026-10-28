@@ -204,11 +204,10 @@ def test_error_responses_are_declared_with_detail(openapi, method, path, status)
     assert schema["required"] == ["detail"]
 
 
-# (method, real URL with id 1, body) for each stub. POST /tickets was removed in KSP-22,
-# where it is replaced by the behaviour tests in test_create_ticket.py.
+# (method, real URL with id 1, body) for each stub. POST /tickets was removed in KSP-22
+# (behaviour tests in test_create_ticket.py), and GET /tickets and GET /tickets/{id} in
+# KSP-23 (behaviour tests in test_core_read.py).
 STUB_CALLS = [
-    ("get", "/tickets", None),
-    ("get", "/tickets/1", None),
     ("patch", "/tickets/1/status", {"status": "in_progress"}),
     ("get", "/tickets/1/history", None),
 ]

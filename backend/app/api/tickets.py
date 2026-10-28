@@ -2,8 +2,8 @@
 
 The five endpoints from CORE section 4 and HIST section 5 have been in /openapi.json
 since KSP-20. The ones not built yet are stubs that answer 501 until the KSP issue that
-builds them replaces the body. Built: POST /tickets (KSP-22, create a ticket).
-Still stubs: GET /tickets and GET /tickets/{id} (KSP-23, list and show), the status
+builds them replaces the body. Built: POST /tickets (KSP-22, create a ticket), and
+GET /tickets and GET /tickets/{id} (KSP-23, list and show). Still stubs: the status
 change (KSP-24) and the history (KSP-35).
 """
 
@@ -13,8 +13,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.db import get_session
+from app.errors import TICKET_NOT_FOUND
 from app.schemas.tickets import ErrorResponse, HistoryEntry, StatusChange, Ticket, TicketCreate
-from app.services.tickets import TicketService
+from app.services.tickets import TicketNotFound, TicketService
 
 # Shown if the frontend calls an endpoint that is not built yet (KSP-20 decision 4).
 NOT_IMPLEMENTED = "Funktionen är inte klar än."
@@ -51,17 +52,26 @@ def create_ticket(ticket: TicketCreate, session: Annotated[Session, Depends(get_
 
 
 @router.get("", response_model=list[Ticket])
-def list_tickets():
-    """List all tickets, newest first (CORE-03). No errors are declared."""
-    _not_implemented()
+def list_tickets(session: Annotated[Session, Depends(get_session)]):
+    """List all tickets, newest first (CORE-03). No errors are declared. Built in KSP-23.
+
+    No tickets gives 200 with [], not an error (CORE-15).
+    """
+    rows = TicketService(session).list()
+    return [Ticket.model_validate(row, from_attributes=True) for row in rows]
 
 
 # ticket_id is an int in the contract (KSP-20 decision 2). That "abc" gives 404
 # instead of 422 (CORE-10, B8) is handled in KSP-21.
 @router.get("/{ticket_id}", response_model=Ticket, responses=_error(404))
-def get_ticket(ticket_id: int):
-    """Get one ticket (CORE-04). 404 if it does not exist (CORE-10)."""
-    _not_implemented()
+def get_ticket(ticket_id: int, session: Annotated[Session, Depends(get_session)]):
+    """Get one ticket (CORE-04). 404 if it does not exist (CORE-10). Built in KSP-23."""
+    try:
+        row = TicketService(session).get(ticket_id)
+    except TicketNotFound:
+        # Same message as for an id that is not an integer (B8), so the frontend shows one text.
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=TICKET_NOT_FOUND)
+    return Ticket.model_validate(row, from_attributes=True)
 
 
 @router.patch("/{ticket_id}/status", response_model=Ticket, responses=_error(404, 409, 422, 503))

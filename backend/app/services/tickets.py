@@ -1,7 +1,8 @@
-"""TicketService: the rules for tickets and where each transaction starts and ends (KSP-22).
+"""TicketService: the rules for tickets and where each transaction starts and ends.
 
-Creating a ticket sets status "new" (CORE-01) and the creation time in UTC. The history
-entry "created" (HIST-01) is added here in the same transaction in KSP-34.
+Creating a ticket (KSP-22) sets status "new" (CORE-01) and the creation time in UTC. The
+history entry "created" (HIST-01) is added here in the same transaction in KSP-34.
+Listing and reading tickets (KSP-23) only read, so they need no commit.
 """
 
 from collections.abc import Callable
@@ -17,13 +18,17 @@ from app.schemas.tickets import Status, TicketCreate
 TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
 
+class TicketNotFound(Exception):
+    """No ticket with that id. The router turns it into 404, so the service knows no HTTP."""
+
+
 def utc_now() -> datetime:
     """The real clock. Tests can pass another one (architecture: replaceable clock)."""
     return datetime.now(UTC)
 
 
 class TicketService:
-    """Creates tickets. One service per request, with that request's session."""
+    """Creates and reads tickets. One service per request, with that request's session."""
 
     def __init__(self, session: Session, clock: Callable[[], datetime] = utc_now):
         self.session = session
@@ -44,4 +49,15 @@ class TicketService:
         self.tickets.add(row)
         # One commit for the whole operation. KSP-34 adds the history entry before it.
         self.session.commit()
+        return row
+
+    def list(self) -> list[TicketRow]:
+        """All tickets, newest first (CORE-03), or an empty list (CORE-15)."""
+        return self.tickets.list_newest_first()
+
+    def get(self, ticket_id: int) -> TicketRow:
+        """One ticket (CORE-04). Raises TicketNotFound for an unknown id (CORE-10)."""
+        row = self.tickets.get(ticket_id)
+        if row is None:
+            raise TicketNotFound(ticket_id)
         return row
