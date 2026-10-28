@@ -207,8 +207,10 @@ def test_core17_unknown_field_gives_only_invalid_input(client):
 
 def test_core10_integer_id_passes_validation(client):
     """CORE-10 happy path: an integer id is not turned into a 404 by the error handler."""
-    # Catches: every id error giving 404, also for valid ids. 501 means the stub was reached.
-    assert_error(client.get("/tickets/1"), 501, NOT_IMPLEMENTED)
+    # Catches: every id error giving 404, also for valid ids. Since KSP-23 an existing
+    # ticket is returned (200); before that, 501 from the stub showed the same thing.
+    created = client.post("/tickets", json=VALID_TICKET).json()
+    assert client.get(f"/tickets/{created['id']}").status_code == 200
 
 
 @pytest.mark.parametrize("ticket_id", ["abc", "1.5", "-", "%20"])
