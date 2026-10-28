@@ -21,7 +21,7 @@ DESCRIPTION_REQUIRED = "Beskrivning måste fyllas i."
 DESCRIPTION_TOO_LONG = "Beskrivningen får vara högst 2000 tecken."
 INVALID_INPUT = "Ogiltig indata."
 
-ZERO_WIDTH_SPACE = "​"
+ZERO_WIDTH_SPACE = "\u200b"
 
 # A valid body (made-up data), so that only the field under test changes.
 VALID_TICKET = {
@@ -135,9 +135,9 @@ def test_length_is_counted_in_code_points_after_trimming(client, field, text):
 
 
 def test_b11_joined_emoji_counts_as_its_code_points(client, database_url):
-    """B11 (joined emoji count as their code points): 98 + 👩‍💻 (3 code points) is 101."""
+    """B11 (joined emoji count as their code points): 98 + 👩\u200d💻 (3 code points) is 101."""
     # Catches: counting what the user sees (grapheme clusters), which would make it 99.
-    response = client.post("/tickets", json=ticket_with(title="a" * 98 + "👩‍💻"))
+    response = client.post("/tickets", json=ticket_with(title="a" * 98 + "👩\u200d💻"))
 
     assert response.status_code == 422
     assert response.json() == {"detail": TITLE_TOO_LONG}
