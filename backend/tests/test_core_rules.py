@@ -4,7 +4,7 @@ Covers CORE-13 (description max 2000 characters), CORE-11 for the description (a
 description of only whitespace is empty), CORE-11 with mixed whitespace and zero-width
 characters, how length is counted (CORE-12, CORE-13, B10 trimming, B11 code points), and
 that nothing is saved when CORE-13, CORE-17 (wrong type gives "Ogiltig indata.") or CORE-18
-(several errors at once) reject the ticket. Part of KSP-25 and KSP-26 (CORE tests).
+(several errors at once) reject the ticket. Part of KSP-26 (CORE tests: validation and edge cases).
 
 Like test_create_ticket.py, the tests read the SQLite file directly, so that they see what
 was really saved. Test proposals reviewed by Nicklas 2026-10-28 (v2-nicklas).
