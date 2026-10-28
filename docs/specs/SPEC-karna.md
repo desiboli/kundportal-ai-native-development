@@ -1,6 +1,6 @@
 # Spec: Kärnan – skapa, lista, visa och validera ärenden (CORE)
 
-> Status: **utkast v0.4** · v0.2 granskad och godkänd av Azalea (PR #5), v0.3 (PR #10) och v0.4 (PR #22) likaså · Ansvarig: Nicklas (yrrving) · Granskare: Azalea (Azaalea) · Vecka 5
+> Status: **utkast v0.5** · v0.2 granskad och godkänd av Azalea (PR #5), v0.3 (PR #10) och v0.4 (PR #22) likaså · Ansvarig: Nicklas (yrrving) · Granskare: Azalea (Azaalea) · Vecka 5
 > Detta dokument är teamets underlag. Individuell redovisning ligger inte här.
 >
 > Bygger på [API-konventioner](../api-konventioner.md)
@@ -104,7 +104,7 @@ Varje kriterium har ett id som används i tester, commits, PR:er och Linear-äre
 
 ### Happy paths
 
-**CORE-01** Givet giltig rubrik, beskrivning, kategori och prioritet, när ärendet skapas, då svarar API:t 201 med ärendet, `status` är `new` och `created_at` är satt i UTC-formatet.
+**CORE-01** Givet giltig rubrik, beskrivning, kategori och prioritet, när ärendet skapas, då svarar API:t 201 med ärendet, `status` är `new` och `created_at` är satt i UTC-formatet. Ärendet sparas med samma uppgifter som i svaret.
 
 **CORE-02** Givet ett skapat ärende, när applikationen startas om (ny engine och ny session mot samma databasfil), då finns ärendet kvar med samma uppgifter i `GET /tickets/{id}`.
 
@@ -208,3 +208,4 @@ Besluten är fattade av Nicklas (2026-10-24). B5, B7 och B8 är förtydligade el
 | v0.2 | 2026-10-24 | Efter Azaleas granskning: fast felordning (B7), CORE-17 "Ogiltig indata.", id som inte är heltal ger 404 (B8), CORE-11 gäller även beskrivning, tecken = Unicode-kodpunkter, sorteringsriktning (B5), meddelande i CORE-09, gräns mot HIST-10, vem som implementerar |
 | v0.3 | 2026-10-25 | B9: fel datatyp tillsammans med saknat fält ger bara "Ogiltig indata." (CORE-17, avsnitt 4). Efter Azaleas provkörning (kommentar i PR #5): ogiltig UTF-8 i CORE-17, B10 vad som räknas som tomt (CORE-11), B11 sammansatta emoji (CORE-14), två nya mutationer |
 | v0.4 | 2026-10-25 | Länkar till `docs/api-konventioner.md` och `docs/teststrategi.md` i repot i stället för Linear. Efter körningarna av testinstruktionen: B12 vad som sparas (trimning bara i ändarna, ingen normalisering), CORE-05 gäller båda fälten, CORE-18 flera fel samtidigt (B7 fick ett krav-id), en ny mutation |
+| v0.5 | 2026-10-28 | CORE-01: ärendet sparas med samma uppgifter som i svaret (Azaleas fråga i PR #34) |
