@@ -6,13 +6,15 @@ from sqlalchemy.orm import sessionmaker
 
 from app.api import health, tickets
 from app.config import database_url_from_env
-from app.db import Base, ensure_sqlite_directory
+from app.db import Base, enable_sqlite_foreign_keys, ensure_sqlite_directory
 from app.errors import register_error_handlers
 
 
 def create_app(database_url: str | None = None) -> FastAPI:
     """Bygger appen mot en given databas. Tester skickar in en temporär fil."""
     engine = create_engine(database_url or database_url_from_env())
+    # The history's link to its ticket is checked by the database too (KSP-33).
+    enable_sqlite_foreign_keys(engine)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
