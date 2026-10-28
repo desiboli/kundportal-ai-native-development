@@ -104,6 +104,7 @@ att klicka sig till exakt den version som kördes.
 
 | Datum | Commit | Typ | Resultat | Körd av |
 | --- | --- | --- | --- | --- |
+| 2026-10-28 | https://github.com/desiboli/kundportal-ai-native-development/commit/65c9f4dc98f9c496e8bf980db8b7f2fe6deb2da6 | automatiskt (pytest) | 107 passed | Nicklas |
 
 Kommando (macOS/Linux): `cd backend && .venv/bin/python -m pytest -q`. Windows: se
 [Teststrategin](teststrategi.md) (avsnitt 5).
