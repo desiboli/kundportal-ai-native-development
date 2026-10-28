@@ -2,9 +2,9 @@
 
 The five endpoints from CORE section 4 and HIST section 5 have been in /openapi.json
 since KSP-20. The ones not built yet are stubs that answer 501 until the KSP issue that
-builds them replaces the body. Built: POST /tickets (KSP-22, create a ticket), and
-GET /tickets and GET /tickets/{id} (KSP-23, list and show). Still stubs: the status
-change (KSP-24) and the history (KSP-35).
+builds them replaces the body. Built: POST /tickets (KSP-22, create a ticket),
+GET /tickets and GET /tickets/{id} (KSP-23, list and show) and GET /tickets/{id}/history
+(KSP-35, read the history). Still a stub: the status change (KSP-24).
 """
 
 from typing import Annotated
@@ -85,6 +85,15 @@ def change_status(ticket_id: int, change: StatusChange):
 
 
 @router.get("/{ticket_id}/history", response_model=list[HistoryEntry], responses=_error(404))
-def get_history(ticket_id: int):
-    """Get the ticket's history, oldest first (HIST-03). 404 if unknown (HIST-08)."""
-    _not_implemented()
+def get_history(ticket_id: int, session: Annotated[Session, Depends(get_session)]):
+    """Get the ticket's history, oldest first (HIST-03). 404 if unknown (HIST-08). Built in KSP-35.
+
+    A ticket without changes still has its "created" entry, so the list is never empty
+    for a ticket that exists (HIST-12).
+    """
+    try:
+        rows = TicketService(session).get_history(ticket_id)
+    except TicketNotFound:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=TICKET_NOT_FOUND)
+    # Through HistoryEntry, so only the contract's fields are sent (no ticket_id).
+    return [HistoryEntry.model_validate(row, from_attributes=True) for row in rows]
