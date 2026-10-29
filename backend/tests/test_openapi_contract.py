@@ -154,13 +154,20 @@ def test_ticket_create_has_length_limits_and_no_status(openapi):
 
 
 def test_status_change_body_takes_only_a_valid_status(openapi):
-    """HIST section 5: the PATCH body is {"status": <status>}."""
-    # Catches: a PATCH body without the status enum.
+    """HIST section 5: the PATCH body is {"status": <status>} and nothing else.
+
+    Other fields, e.g. {"status": "closed", "title": "x"}, are rejected with "Ogiltig
+    indata.", the same as unknown fields in POST (decided in PR #43, 2026-10-29).
+    """
+    # Catches: a PATCH body without the status enum, or other fields being ignored, so a
+    # client could believe that the title was changed when it was not.
     operation = openapi["paths"]["/tickets/{ticket_id}/status"]["patch"]
     body = resolve(openapi, operation["requestBody"]["content"]["application/json"]["schema"])
 
+    assert set(body["properties"]) == {"status"}
     assert body["required"] == ["status"]
     assert enum_values(openapi, body["properties"]["status"]) == STATUSES
+    assert body["additionalProperties"] is False
 
 
 def test_history_entry_fields_match_spec(openapi):
