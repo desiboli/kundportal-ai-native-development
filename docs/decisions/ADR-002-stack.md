@@ -1,6 +1,6 @@
 # ADR-002: Teknikstack för Kundserviceportalen
 
-> Status: **föreslaget, väntar på teamets godkännande** · Ansvarig: Nicklas (yrrving) · Datum: 2026-10-25
+> Status: **beslutat** · Ansvarig: Nicklas (yrrving) · Datum: 2026-10-25, avsnitt 3 ändrat 2026-10-29 (BOLDkit)
 > Underlag: Slack 2026-10-21–25, teammötet 2026-10-25, PR #3 (backendskelett: FastAPI, SQLite och /health): https://github.com/desiboli/kundportal-ai-native-development/pull/3 och PR #11 (frontend-skelett med React, Vite och TypeScript): https://github.com/desiboli/kundportal-ai-native-development/pull/11.
 
 ## Kontext
@@ -22,7 +22,7 @@ Stacken diskuterades i Slack och landade under mötet 2026-10-25, när backend- 
 | Databas | SQLite (en fil) via SQLAlchemy 2 |
 | Backendtester | pytest + FastAPIs TestClient |
 | Frontend | React + Vite + TypeScript |
-| Utseende | Tailwind CSS + shadcn/ui, stil "Luma", grundkomponenter från Base UI |
+| Utseende | Tailwind CSS + shadcn/ui (stil "Luma") med registret BOLDkit (tema och komponenter), grundkomponenter från Base UI |
 | Pakethanterare (frontend) | pnpm |
 | Struktur | `backend/` och `frontend/` som separata mappar i samma repo, inte ett monorepo-verktyg |
 
@@ -50,7 +50,9 @@ Alternativ: PostgreSQL eller en JSON-fil. PostgreSQL kräver en databasserver, v
 | För | Officiellt, MIT-licens, mycket använt. Tillgängliga grundkomponenter. AI-verktygen känner till det väl. Teman kan ändras senare. | Mer unikt utseende direkt. Bygger ovanpå shadcn. | Inget beroende. |
 | Emot | Ser mer "standard" ut. | Små projekt: licens, underhåll och tillgänglighet måste kontrolleras. | Vi bygger varje komponent själva, vilket tar tid. |
 
-**Valt: vanliga shadcn/ui tills vidare.** Amalia provar register lokalt på en egen branch. Om vi byter, gäller det bara temat. Oavsett val skrivs en gemensam instruktion (skill) så att alla agenter använder samma komponenter, i stället för att göra egna lösningar varje gång.
+**Valt: BOLDkit** (teammötet 2026-10-27, infört i PR #38 (BOLDkit-tema med badge och card): https://github.com/desiboli/kundportal-ai-native-development/pull/38). Först valdes vanliga shadcn/ui tills vidare (2026-10-25), och Amalia provade register på en egen branch. Teamet gillade hennes BOLDkit-test: utseendet är bestämt en gång, så ingen behöver fundera på hur knappar och kort ska se ut. Bytet gäller bara temat och komponenterna. Grundkomponenterna är fortfarande Base UI (avsnitt 4), så BOLDkits knapp, som bygger på Radix, har fått sin stil flyttad till Base UI-knappen.
+
+Det här kontrollerades mot "Emot" i tabellen (2026-10-29): BOLDkit har MIT-licens (https://github.com/ANIBIT14/boldkit) och uppdaterades senast 2026-10-20, men har bara en utvecklare. MCP-servern `@boldkit/mcp` finns bara i version 0.1.0 och ska därför låsas till den versionen (önskemål i granskningen av PR #47). Tillgängligheten kommer från Base UI. Färgerna och kontrasten i temat är inte kontrollerade än. Om BOLDkit slutar underhållas påverkas inget som redan är installerat, eftersom komponenterna kopieras in i `frontend/src/components/ui/`. En gemensam instruktion (skill, PR #47) gör att alla agenter hämtar från BOLDkit och lämnar temat orört.
 
 ### 4. Grundkomponenter: Base UI eller Radix
 
@@ -72,11 +74,19 @@ Skelettverktyget erbjöd ett monorepo. **Valt: separata mappar** (`backend/`, `f
 - **SQLite kontrollerar inte främmande nycklar som standard.** Backenden måste slå på det med `PRAGMA foreign_keys=ON` för varje anslutning, annars kan en historikpost peka på ett ärende som inte finns.
 - **Två språk:** typerna i frontend kan glida isär från backend. Därför genereras TypeScript-typerna från API:ts OpenAPI-schema med `openapi-typescript` (KSP-28), bekräftas på teammötet 2026-10-27. Tills dess är API-konventionerna och specarna det som håller ihop dem.
 - **Frontendtester:** Vitest och Testing Library är planerade (Teststrategin) men ännu inte installerade i `frontend/`.
-- **Designsystemet** behöver en egen instruktion för agenterna, så att utseendet inte ändras vid varje ny komponent.
+- **Designsystemet:** nya beroenden `clsx`, `tailwind-merge` och typsnittet Outfit (PR #38). Agenterna följer skillen `boldkit` (PR #47), så att utseendet inte ändras vid varje ny komponent.
+- **Kontrasten i BOLDkit-temat** är inte kontrollerad. Den behöver prövas innan demon, se Öppna frågor.
 
 ## Öppna frågor
 
 | Fråga | Ägare | När |
 | --- | --- | --- |
-| Byter vi till ett register eller behåller vanliga shadcn? | Amalia | Efter hennes test på branch |
 | Vilken Node-version gäller (anges i README)? | Musse | Med frontendens körinstruktioner |
+| Klarar BOLDkit-temat kontrastkraven (text mot bakgrund, statusbrickor)? | Bestäms av teamet | Före demon |
+
+## Ändringar
+
+| Datum | Vad |
+| --- | --- |
+| 2026-10-25 | Första versionen, efter teammötet |
+| 2026-10-29 | Avsnitt 3: BOLDkit valt (teammötet 2026-10-27, PR #38). Licens och underhåll kontrollerade. Status satt till beslutat |
