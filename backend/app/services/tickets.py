@@ -1,7 +1,9 @@
 """TicketService: the rules for tickets and where each transaction starts and ends.
 
-Creating a ticket (KSP-22) sets status "new" (CORE-01) and the creation time in UTC. The
-history entry "created" (HIST-01) is added here in the same transaction in KSP-34.
+Creating a ticket (KSP-22) sets status "new" (CORE-01) and writes the history entry
+"created" (HIST-01) in the same transaction (KSP-34). Changing the status writes the new
+status and a "status_changed" entry together, with one commit (HIST-02, ADR-001: the
+transaction lives here in the service). Status is only ever written here (AGENTS.md).
 Listing and reading tickets (KSP-23) only read, so they need no commit.
 """
 
@@ -10,9 +12,11 @@ from datetime import UTC, datetime
 
 from sqlalchemy.orm import Session
 
+from app.models.history import HistoryRow
 from app.models.tickets import TicketRow
+from app.repositories.history import HistoryRepository
 from app.repositories.tickets import TicketRepository
-from app.schemas.tickets import Status, TicketCreate
+from app.schemas.tickets import EventType, Status, TicketCreate
 
 # API conventions section 3: UTC, always with microseconds, e.g. 2026-10-25T09:00:00.000000Z.
 TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
@@ -20,6 +24,14 @@ TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
 class TicketNotFound(Exception):
     """No ticket with that id. The router turns it into 404, so the service knows no HTTP."""
+
+
+class SameStatus(Exception):
+    """The ticket already has that status (service part of HIST-07).
+
+    Rejected here so that an "x -> x" entry is never written: history entries are never
+    changed or deleted, so a wrong one would stay forever. The router turns it into 409.
+    """
 
 
 def utc_now() -> datetime:
@@ -33,10 +45,20 @@ class TicketService:
     def __init__(self, session: Session, clock: Callable[[], datetime] = utc_now):
         self.session = session
         self.tickets = TicketRepository(session)
+        self.history = HistoryRepository(session)
         self.clock = clock
 
+    def _now(self) -> str:
+        """The current time in the fixed UTC text format."""
+        return self.clock().strftime(TIMESTAMP_FORMAT)
+
     def create(self, data: TicketCreate) -> TicketRow:
-        """Save a new ticket with status "new". The input is already validated and trimmed."""
+        """Save a new ticket with status "new" and its "created" entry, in one transaction.
+
+        The input is already validated and trimmed, so a 422 never gets here (HIST-10).
+        """
+        # One reading of the clock, so the entry has exactly the ticket's created_at (HIST-01).
+        now = self._now()
         row = TicketRow(
             title=data.title,
             description=data.description,
@@ -44,11 +66,46 @@ class TicketService:
             priority=data.priority,
             # CORE-01: the server always sets the first status, the client cannot (CORE-09).
             status=Status.NEW,
-            created_at=self.clock().strftime(TIMESTAMP_FORMAT),
+            created_at=now,
         )
+        # add() flushes, so the ticket has an id that the entry can point to.
         self.tickets.add(row)
-        # One commit for the whole operation. KSP-34 adds the history entry before it.
+        self.history.add(
+            HistoryRow(
+                ticket_id=row.id,
+                event_type=EventType.CREATED,
+                from_status=None,
+                to_status=Status.NEW,
+                occurred_at=now,
+            )
+        )
+        # One commit for ticket and entry together: both are saved, or neither (ADR-001).
         self.session.commit()
+        return row
+
+    def change_status(self, ticket_id: int, new_status: Status) -> TicketRow:
+        """Change the status and write a "status_changed" entry, in one transaction (HIST-02).
+
+        Raises TicketNotFound for an unknown id and SameStatus if nothing would change.
+        """
+        row = self.get(ticket_id)
+        if row.status == new_status:
+            raise SameStatus(ticket_id)
+        previous = row.status
+        row.status = new_status
+        self.history.add(
+            HistoryRow(
+                ticket_id=row.id,
+                event_type=EventType.STATUS_CHANGED,
+                from_status=previous,
+                to_status=new_status,
+                occurred_at=self._now(),
+            )
+        )
+        # The one commit for status and entry. Nothing is saved before it (ADR-001).
+        self.session.commit()
+        # Load the saved values, so the row can still be read after the session is closed.
+        self.session.refresh(row)
         return row
 
     def list(self) -> list[TicketRow]:
