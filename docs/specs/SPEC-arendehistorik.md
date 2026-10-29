@@ -1,6 +1,6 @@
 # Spec: Statuslogik och ärendehistorik (kompletterande funktion)
 
-> Status: **v0.8, statusarna motiverade** · Ansvarig: Azalea (Azaalea) · Vecka 5
+> Status: **v0.9, statusarna motiverade, null och andra fält i PATCH** · Ansvarig: Azalea (Azaalea) · Vecka 6
 > Detta dokument är teamets underlag. Individuell redovisning ligger inte här.
 >
 > **Ändrat i v0.3 (2026-10-23), efter feedback från teamet:** kärnan får en
@@ -25,6 +25,10 @@
 > examinationen räknar "ändra status" till kärnan. Historiken är tilläggsfunktionen (04).
 >
 > **Ändrat i v0.8 (2026-10-29):** motivering av de fyra statusarna i antagande 2.
+>
+> **Ändrat i v0.9 (2026-10-29), svar på Nicklas frågor i PR #43 (statusreglerna):**
+> `{"status": null}` är fel datatyp och ger "Ogiltig indata." (HIST-06, samma som B9 i CORE).
+> Andra fält än `status` i `PATCH` avvisas med "Ogiltig indata.", som okända fält i `POST`.
 
 **Gemensamma dokument (huvudversioner) i repot.** Delar av specen gäller hela teamet och
 har därför fått egna dokument. Specen är fortfarande komplett, men vid skillnad gäller det
@@ -187,7 +191,8 @@ ovan (krävs för HIST-06 och HIST-14).
 | --- | --- | --- |
 | Okänt ärende, eller id som inte är ett heltal | 404 | Ärendet finns inte. |
 | Okänd eller saknad status (t.ex. `"klar"`) | 422 | Välj en giltig status. |
-| Fel datatyp (t.ex. `{"status": 5}`), saknad kropp eller trasig JSON | 422 | Ogiltig indata. |
+| Fel datatyp (t.ex. `{"status": 5}` eller `{"status": null}`), saknad kropp eller trasig JSON | 422 | Ogiltig indata. |
+| Andra fält än `status` (t.ex. `{"status": "closed", "title": "x"}`), inget ändras | 422 | Ogiltig indata. |
 | Samma status som nuvarande | 409 | Ärendet har redan den statusen. |
 | Historikposten kunde inte sparas (allt rullas tillbaka) | 503 | Statusen kunde inte ändras. Försök igen. |
 
@@ -221,7 +226,8 @@ HIST-06, 07 och 13 är statusregler, de övriga gäller historiken.
 - **HIST-06** Givet en ogiltig status (`"klar"`), när statusändring försöks, då svarar
   API:t 422 med "Välj en giltig status.", ärendets status är oförändrad och
   ingen ny historikpost har skapats.
-  Fel datatyp (t.ex. `{"status": 5}`) ger i stället bara "Ogiltig indata." (samma som B9 i CORE).
+  Fel datatyp (t.ex. `{"status": 5}` eller `{"status": null}`) och andra fält än `status`
+  ger i stället bara "Ogiltig indata." (samma som B9 i CORE), och inget ändras.
 - **HIST-07** Givet att ärendet redan har status `in_progress`, när samma status skickas,
   då svarar API:t 409 med "Ärendet har redan den statusen." och ingen historikpost skapas.
   Det gäller alla fyra statusar, även ett nytt ärende som får `new` igen.

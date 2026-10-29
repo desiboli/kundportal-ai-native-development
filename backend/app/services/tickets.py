@@ -4,8 +4,11 @@ Creating a ticket (KSP-22) sets status "new" (CORE-01) and writes the history en
 "created" (HIST-01) in the same transaction (KSP-34). Changing the status writes the new
 status and a "status_changed" entry together, with one commit (HIST-02, ADR-001: the
 transaction lives here in the service). Status is only ever written here (AGENTS.md).
-Listing and reading tickets (KSP-23) only read, so they need no commit.
+Listing and reading tickets (KSP-23) and the history (KSP-35) only read, so they need no commit.
 """
+
+# Annotations are not evaluated at class creation, since list() is also a method name here.
+from __future__ import annotations
 
 from collections.abc import Callable
 from datetime import UTC, datetime
@@ -118,3 +121,12 @@ class TicketService:
         if row is None:
             raise TicketNotFound(ticket_id)
         return row
+
+    def get_history(self, ticket_id: int) -> list[HistoryRow]:
+        """The ticket's history, oldest first (HIST-03, HIST-11).
+
+        Checks first that the ticket exists, so an unknown id gives TicketNotFound (HIST-08)
+        and never an empty list. A ticket that exists always has its "created" entry (HIST-12).
+        """
+        self.get(ticket_id)
+        return self.history.list_for_ticket(ticket_id)

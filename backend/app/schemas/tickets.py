@@ -108,6 +108,11 @@ class Ticket(BaseModel):
 class StatusChange(BaseModel):
     """Request body for PATCH /tickets/{ticket_id}/status (HIST section 5)."""
 
+    # Only the status can be changed here. Other fields, e.g. a title, are rejected with
+    # "Ogiltig indata." like unknown fields in POST, so a client never believes they were
+    # saved (decided in PR #43). In the schema this becomes additionalProperties: false.
+    model_config = ConfigDict(extra="forbid")
+
     status: Status
 
 

@@ -1,10 +1,10 @@
 """Endpoints for tickets and their history (contract in KSP-20).
 
 The five endpoints from CORE section 4 and HIST section 5 have been in /openapi.json
-since KSP-20. The ones not built yet are stubs that answer 501 until the KSP issue that
-builds them replaces the body. Built: POST /tickets (KSP-22, create a ticket), and
-GET /tickets and GET /tickets/{id} (KSP-23, list and show). Still stubs: the status
-change (KSP-24) and the history (KSP-35).
+since KSP-20, first as stubs that answered 501. All are built now: POST /tickets (KSP-22,
+create a ticket), GET /tickets and GET /tickets/{id} (KSP-23, list and show),
+GET /tickets/{id}/history (KSP-35, read the history) and PATCH /tickets/{id}/status
+(KSP-24, change status).
 """
 
 from typing import Annotated
@@ -13,12 +13,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.db import get_session
-from app.errors import TICKET_NOT_FOUND
+from app.errors import SAME_STATUS, TICKET_NOT_FOUND
 from app.schemas.tickets import ErrorResponse, HistoryEntry, StatusChange, Ticket, TicketCreate
-from app.services.tickets import TicketNotFound, TicketService
-
-# Shown if the frontend calls an endpoint that is not built yet (KSP-20 decision 4).
-NOT_IMPLEMENTED = "Funktionen är inte klar än."
+from app.services.tickets import SameStatus, TicketNotFound, TicketService
 
 # All paths below start with /tickets and are grouped as "tickets" in /docs.
 router = APIRouter(prefix="/tickets", tags=["tickets"])
@@ -31,11 +28,6 @@ def _error(*codes: int) -> dict:
     of objects and breaks the error format (CORE-16, HIST-14).
     """
     return {code: {"model": ErrorResponse} for code in codes}
-
-
-def _not_implemented():
-    """Answer 501 with a Swedish message, in the same format as every other error."""
-    raise HTTPException(status_code=status.HTTP_501_NOT_IMPLEMENTED, detail=NOT_IMPLEMENTED)
 
 
 # response_model sets the success body in the schema, and status_code its HTTP code.
@@ -75,16 +67,35 @@ def get_ticket(ticket_id: int, session: Annotated[Session, Depends(get_session)]
 
 
 @router.patch("/{ticket_id}/status", response_model=Ticket, responses=_error(404, 409, 422, 503))
-def change_status(ticket_id: int, change: StatusChange):
-    """Change the status and write a history entry in the same transaction (HIST-02).
+def change_status(
+    ticket_id: int, change: StatusChange, session: Annotated[Session, Depends(get_session)]
+):
+    """Change the status and write a history entry in the same transaction (HIST-02). Built in KSP-24.
 
-    404 unknown ticket (HIST-08), 409 same status as now (HIST-07),
-    422 invalid status (HIST-06), 503 the history entry could not be saved (HIST-09).
+    Every change between two different statuses is allowed, also closed -> new (HIST-13).
+    404 unknown ticket (HIST-08), 409 same status as now (HIST-07). 422 for an invalid
+    status (HIST-06) comes from StatusChange and the error handlers (KSP-21) before this
+    runs. 503 when the history entry cannot be saved (HIST-09) is built in KSP-36.
     """
-    _not_implemented()
+    try:
+        row = TicketService(session).change_status(ticket_id, change.status)
+    except TicketNotFound:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=TICKET_NOT_FOUND)
+    except SameStatus:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=SAME_STATUS)
+    return Ticket.model_validate(row, from_attributes=True)
 
 
 @router.get("/{ticket_id}/history", response_model=list[HistoryEntry], responses=_error(404))
-def get_history(ticket_id: int):
-    """Get the ticket's history, oldest first (HIST-03). 404 if unknown (HIST-08)."""
-    _not_implemented()
+def get_history(ticket_id: int, session: Annotated[Session, Depends(get_session)]):
+    """Get the ticket's history, oldest first (HIST-03). 404 if unknown (HIST-08). Built in KSP-35.
+
+    A ticket without changes still has its "created" entry, so the list is never empty
+    for a ticket that exists (HIST-12).
+    """
+    try:
+        rows = TicketService(session).get_history(ticket_id)
+    except TicketNotFound:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=TICKET_NOT_FOUND)
+    # Through HistoryEntry, so only the contract's fields are sent (no ticket_id).
+    return [HistoryEntry.model_validate(row, from_attributes=True) for row in rows]

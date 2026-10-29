@@ -40,7 +40,8 @@ Teamets plan för veckan (milstolpe 03 Case Management i Linear):
 | Saknad status i statusbytet (`PATCH` med `{}`) ger "Välj en giltig status." enligt HIST-06 (okänd eller saknad status). Ett anrop helt utan kropp ger fortfarande "Ogiltig indata." (B9). Hittat av Nicklas i granskningen av PR #30 | Azalea | PR #32 (saknad status i PATCH ger "Välj en giltig status."): https://github.com/desiboli/kundportal-ai-native-development/pull/32 · godkänd av Nicklas, mergad 2026-10-27 |
 | Registrera ärenden: `POST /tickets` sparar i SQLite med status `new` och tid i UTC (CORE-01, giltigt ärende ger 201). Rubrik och beskrivning trimmas i ändarna, även nollbreddstecken (CORE-05, B10, B12), en rubrik med bara blanktecken räknas som tom (CORE-11), och längden räknas efter trimning (CORE-12, max 100 tecken). Tabellen `tickets`, TicketRepository och TicketService enligt lagren i arkitekturen (KSP-22) | Azalea | PR #34 (ärendemodell och POST /tickets med trimning): https://github.com/desiboli/kundportal-ai-native-development/pull/34 · godkänd av Nicklas, mergad 2026-10-28 |
 | Lista och visa ärenden: `GET /tickets` visar alla ärenden nyaste först (CORE-03, B5) och `[]` när inga finns (CORE-15). `GET /tickets/{id}` visar ett ärende med exakt det som sparades (CORE-04), och okänt id ger 404 "Ärendet finns inte." (CORE-10). Byggt mot Nicklas tester i PR #40 (lista och öppna ärenden, KSP-25): https://github.com/desiboli/kundportal-ai-native-development/pull/40 (KSP-23) | Azalea (kod), Nicklas (tester) | PR #41 (lista och visa ärenden, GET /tickets och GET /tickets/{id}): https://github.com/desiboli/kundportal-ai-native-development/pull/41 · mergad 2026-10-28 |
-| Historiken: tabellen `ticket_history`, där varje nytt ärende får posten `created` (HIST-01) och varje statusbyte skriver ny status och posten `status_changed` i samma transaktion (HIST-02, ADR-001). Samma status avvisas i servicen, så ingen post "x → x" skrivs (servicedelen av HIST-07). SQLite kontrollerar att varje post pekar på ett riktigt ärende (KSP-33, KSP-34) | Azalea | PR #44 (historiken skrivs med status i samma transaktion): https://github.com/desiboli/kundportal-ai-native-development/pull/44 · öppen, granskare Nicklas |
+| Historiken: tabellen `ticket_history`, där varje nytt ärende får posten `created` (HIST-01) och varje statusbyte skriver ny status och posten `status_changed` i samma transaktion (HIST-02, ADR-001). Samma status avvisas i servicen, så ingen post "x → x" skrivs (servicedelen av HIST-07). SQLite kontrollerar att varje post pekar på ett riktigt ärende (KSP-33, KSP-34) | Azalea | PR #44 (historiken skrivs med status i samma transaktion): https://github.com/desiboli/kundportal-ai-native-development/pull/44 · godkänd av Nicklas, mergad 2026-10-28 |
+| Läsa historiken: `GET /tickets/{id}/history` ger ett ärendes poster äldst först (HIST-03), med samma tid ordnat efter id (HIST-11). Ett ärende utan byten ger bara `created` (HIST-12), och ett okänt id ger 404 (HIST-08). Flyttad från vecka 7, eftersom Nicklas tester för statusreglerna läser historiken (KSP-35) | Azalea | PR #45 (läsa historiken, GET /tickets/{id}/history): https://github.com/desiboli/kundportal-ai-native-development/pull/45 · öppen, granskare Nicklas och Amalia |
 
 ## Verifierat
 
@@ -96,6 +97,13 @@ Teamets plan för veckan (milstolpe 03 Case Management i Linear):
 - KSP-33 och KSP-34, manuellt (Azalea): ett ärende skapat i `/docs`, status bytt via servicen.
   Databasen visade två poster (`created` med samma tid som ärendet, sedan `status_changed`)
   och att invarianten håller. Samma status igen stoppades (`SameStatus`) utan någon ny post.
+- Granskning av PR #44 (historiken): Nicklas läste koden mot HIST-specen och ADR-001 och
+  fick 117 passed lokalt. Han provade också sina 23 tester för statusreglerna mot
+  `change_status()` (23 passed).
+- KSP-35 (läsa historiken), testerna först: Azaleas sju tester i `test_read_history.py`
+  föll på 501 (6) eller var redan gröna som skydd (`abc`, tack vare KSP-21). Efter koden:
+  `123 passed`. Azalea provade själv i `/docs`: ett nytt ärende gav en post, ett ärende med
+  ett byte gav två poster äldst först, och `999` och `abc` gav 404.
 
 ## Osäkert eller ofärdigt
 

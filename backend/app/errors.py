@@ -27,6 +27,8 @@ INVALID_CATEGORY = "Välj en giltig kategori."
 INVALID_PRIORITY = "Välj en giltig prioritet."
 STATUS_NOT_ALLOWED = "Status sätts automatiskt och kan inte anges när ett ärende skapas."
 INVALID_STATUS = "Välj en giltig status."
+# HIST-07: the ticket already has the status that was sent (raised by the router, KSP-24).
+SAME_STATUS = "Ärendet har redan den statusen."
 INVALID_INPUT = "Ogiltig indata."
 TICKET_NOT_FOUND = "Ärendet finns inte."
 PAGE_NOT_FOUND = "Sidan finns inte."

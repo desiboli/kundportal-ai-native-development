@@ -47,7 +47,7 @@ Alla fel, även valideringsfel, har samma form:
 | 404 | Okänt ärende, även id som inte är ett heltal (B8 i CORE, HIST-08) | `GET /tickets/999`, `GET /tickets/abc` → "Ärendet finns inte." |
 | 409 | Konflikt med nuvarande läge | Samma status som nuvarande → "Ärendet har redan den statusen." (HIST-07) |
 | 422 | Ogiltig indata | Tom rubrik, okänd status (`"klar"` → "Välj en giltig status.", HIST-06). Vanliga fältfel visas i fältordningen (B7) |
-| 422 | Trasigt anrop | Fel datatyp, saknad kropp eller trasig JSON → bara "Ogiltig indata." (CORE-17, B9) |
+| 422 | Trasigt anrop | Fel datatyp (även `{"status": null}`), okända fält (även andra fält än `status` i `PATCH`), saknad kropp eller trasig JSON → bara "Ogiltig indata." (CORE-17, B9, HIST-06) |
 | 500 | Oväntat fel | Svarar ändå med `{"detail": ...}` utan tekniska detaljer |
 | 503 | Databasen går inte att använda just nu (tillfälligt) | `/health` → "Databasen går inte att nå just nu." · historikposten kunde inte sparas → "Statusen kunde inte ändras. Försök igen." och inget ändras (HIST-09) |
 

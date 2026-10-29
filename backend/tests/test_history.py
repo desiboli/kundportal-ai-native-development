@@ -230,3 +230,16 @@ def test_change_status_to_same_status_is_rejected(client, database_url):
     assert saved_status(database_url, ticket["id"]) == "new"
     assert [e["event_type"] for e in saved_history(database_url, ticket["id"])] == ["created"]
     assert_invariant(database_url, ticket["id"])
+
+
+# --- Unknown ticket in a status change (HIST-08, through PATCH from KSP-24) ---
+
+
+def test_hist08_change_status_of_unknown_ticket_gives_404(client, database_url):
+    """HIST-08: PATCH on a ticket that does not exist gives 404, and nothing is created."""
+    # Catches: TicketNotFound not turned into 404, or a history entry written anyway.
+    response = client.patch("/tickets/999/status", json={"status": "closed"})
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Ärendet finns inte."}
+    assert saved_history(database_url) == []

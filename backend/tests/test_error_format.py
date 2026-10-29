@@ -6,10 +6,9 @@ missing body, broken JSON or invalid UTF-8 gives only "Ogiltig indata."), CORE-1
 errors are joined in field order) and the backend part of HIST-14 (same error format for
 status and history).
 
-Most endpoints are still stubs that answer 501, so a request that passes validation gets
-501. That is how these tests show that valid input is let through. POST /tickets is built
-since KSP-22 and answers 201. "No ticket is saved" and trimming (B10, B12) are tested in
-test_create_ticket.py (KSP-22).
+The endpoints were stubs that answered 501 when these tests were written. All are built
+now (KSP-22 to KSP-24, KSP-35), so a request that passes validation reaches real code.
+"No ticket is saved" and trimming (B10, B12) are tested in test_create_ticket.py (KSP-22).
 """
 
 import pytest
@@ -32,7 +31,6 @@ TICKET_NOT_FOUND = "Ärendet finns inte."
 PAGE_NOT_FOUND = "Sidan finns inte."
 METHOD_NOT_ALLOWED = "Metoden stöds inte."
 UNEXPECTED_ERROR = "Något gick fel. Försök igen."
-NOT_IMPLEMENTED = "Funktionen är inte klar än."
 
 # A valid body (made-up data), so that only the field under test is wrong.
 VALID_TICKET = {
@@ -239,7 +237,7 @@ def test_wrong_method_gives_swedish_405(client):
     assert_error(client.delete("/tickets/1"), 405, METHOD_NOT_ALLOWED)
 
 
-# --- D. Format, 500 and 501 (CORE-16, HIST-14) ---
+# --- D. Format and 500 (CORE-16, HIST-14) ---
 
 
 @pytest.fixture
@@ -270,8 +268,10 @@ def test_core16_unexpected_error_gives_swedish_500(failing_client):
 def test_hist14_swedish_http_exception_passes_unchanged(client):
     """HIST-14 (same error format for status): an HTTPException with a Swedish detail is kept."""
     # Catches: the HTTPException handler overwriting every detail, e.g. with "Ogiltig indata.".
-    response = client.patch("/tickets/1/status", json={"status": "in_progress"})
-    assert_error(response, 501, NOT_IMPLEMENTED)
+    # Since KSP-24 the router raises 404 "Ärendet finns inte." for an unknown ticket; before
+    # that, 501 from the stub showed the same thing.
+    response = client.patch("/tickets/999/status", json={"status": "in_progress"})
+    assert_error(response, 404, TICKET_NOT_FOUND)
 
 
 @pytest.mark.parametrize(
