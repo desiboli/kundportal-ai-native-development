@@ -50,6 +50,9 @@ Frontend: se `frontend/README.md` (pnpm). Backend körs på **port 8010**, inte 
   "Ogiltig indata." (CORE-17, B9). Id som inte är heltal ger 404 "Ärendet finns inte." (B8).
 - **Status ändras bara** via `PATCH /tickets/{id}/status` och `TicketService`, i samma
   transaktion som historikposten.
+- **Statusar är koder** i API, databas och tester: `new`, `in_progress`,
+  `waiting_on_customer`, `closed`. Bara UI visar svenska etiketter (Nytt, Pågående,
+  Väntar på kund, Avslutat). Se antagande 2 i `docs/specs/SPEC-arendehistorik.md`.
 - **Arbeta i en egen branch** och öppna en intern PR mot forkens `main`. Någon annan granskar
   innan merge. Alla konversationer i PR:en ska vara lösta.
 - **PR-referenser** skrivs med hel länk och beskrivning, t.ex.
