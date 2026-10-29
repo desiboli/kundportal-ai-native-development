@@ -52,7 +52,7 @@ Alternativ: PostgreSQL eller en JSON-fil. PostgreSQL kräver en databasserver, v
 
 **Valt: BOLDkit** (teammötet 2026-10-27, infört i PR #38 (BOLDkit-tema med badge och card): https://github.com/desiboli/kundportal-ai-native-development/pull/38). Först valdes vanliga shadcn/ui tills vidare (2026-10-25), och Amalia provade register på en egen branch. Teamet gillade hennes BOLDkit-test: utseendet är bestämt en gång, så ingen behöver fundera på hur knappar och kort ska se ut. Bytet gäller bara temat och komponenterna. Grundkomponenterna är fortfarande Base UI (avsnitt 4), så BOLDkits knapp, som bygger på Radix, har fått sin stil flyttad till Base UI-knappen.
 
-Det här kontrollerades mot "Emot" i tabellen (2026-10-29): BOLDkit har MIT-licens (https://github.com/ANIBIT14/boldkit) och uppdaterades senast 2026-10-20, men har bara en utvecklare. MCP-servern `@boldkit/mcp` finns bara i version 0.1.0 och ska därför låsas till den versionen (önskemål i granskningen av PR #47). Tillgängligheten kommer från Base UI. Färgerna och kontrasten i temat är inte kontrollerade än. Om BOLDkit slutar underhållas påverkas inget som redan är installerat, eftersom komponenterna kopieras in i `frontend/src/components/ui/`. En gemensam instruktion (skill, PR #47) gör att alla agenter hämtar från BOLDkit och lämnar temat orört.
+Det här kontrollerades mot "Emot" i tabellen (2026-10-29): BOLDkit har MIT-licens (https://github.com/ANIBIT14/boldkit) och uppdaterades senast 2026-10-20, men har bara en utvecklare. MCP-servern `@boldkit/mcp` finns bara i version 0.1.0 och är därför låst till den versionen i PR #47 (skills för testförslag, API-typer och BOLDkit): https://github.com/desiboli/kundportal-ai-native-development/pull/47. Tillgängligheten kommer från Base UI. Färgerna och kontrasten i temat är inte kontrollerade än. Om BOLDkit slutar underhållas påverkas inget som redan är installerat, eftersom komponenterna kopieras in i `frontend/src/components/ui/`. En gemensam instruktion (skillen `boldkit`) gör att alla agenter hämtar från BOLDkit och lämnar temat orört.
 
 ### 4. Grundkomponenter: Base UI eller Radix
 
@@ -74,7 +74,7 @@ Skelettverktyget erbjöd ett monorepo. **Valt: separata mappar** (`backend/`, `f
 - **SQLite kontrollerar inte främmande nycklar som standard.** Backenden måste slå på det med `PRAGMA foreign_keys=ON` för varje anslutning, annars kan en historikpost peka på ett ärende som inte finns.
 - **Två språk:** typerna i frontend kan glida isär från backend. Därför genereras TypeScript-typerna från API:ts OpenAPI-schema med `openapi-typescript` (KSP-28), bekräftas på teammötet 2026-10-27. Tills dess är API-konventionerna och specarna det som håller ihop dem.
 - **Frontendtester:** Vitest och Testing Library är planerade (Teststrategin) men ännu inte installerade i `frontend/`.
-- **Designsystemet:** nya beroenden `clsx`, `tailwind-merge` och typsnittet Outfit (PR #38). Agenterna följer skillen `boldkit` (PR #47), så att utseendet inte ändras vid varje ny komponent.
+- **Designsystemet:** nya beroenden `clsx` och `tailwind-merge`, och typsnittet Outfit, som ersätter Inter (PR #38 (BOLDkit-tema med badge och card): https://github.com/desiboli/kundportal-ai-native-development/pull/38). När PR #47 (skills för testförslag, API-typer och BOLDkit): https://github.com/desiboli/kundportal-ai-native-development/pull/47 är mergad följer agenterna skillen `boldkit`, så att utseendet inte ändras vid varje ny komponent.
 - **Kontrasten i BOLDkit-temat** är inte kontrollerad. Den behöver prövas innan demon, se Öppna frågor.
 
 ## Öppna frågor
@@ -89,4 +89,4 @@ Skelettverktyget erbjöd ett monorepo. **Valt: separata mappar** (`backend/`, `f
 | Datum | Vad |
 | --- | --- |
 | 2026-10-25 | Första versionen, efter teammötet |
-| 2026-10-29 | Avsnitt 3: BOLDkit valt (teammötet 2026-10-27, PR #38). Licens och underhåll kontrollerade. Status satt till beslutat |
+| 2026-10-29 | Avsnitt 3: BOLDkit valt (teammötet 2026-10-27, PR #38 (BOLDkit-tema med badge och card): https://github.com/desiboli/kundportal-ai-native-development/pull/38). Licens och underhåll kontrollerade. Status satt till beslutat |
