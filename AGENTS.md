@@ -45,6 +45,10 @@ Frontend: se `frontend/README.md` (pnpm). Backend körs på **port 8010**, inte 
   på engelska: `# CORE-10: unknown ticket or non-integer id gives 404`.
 - **Testerna först:** skriv eller ändra testet, se det falla av rätt anledning, bygg sedan.
 - **Kör testerna före varje commit.** CI kör dem igen på varje PR.
+- **Misstagslogg:** gör agenten ett misstag (t.ex. ett felaktigt antagande, ett test som inte
+  körts eller en ändring i fel fil) skriver den ner det med en regel som förhindrar att det
+  händer igen, i sin användares egen logg utanför repot. Loggen läses innan arbetet börjar.
+  Underlag till utvärderingen i vecka 8 (KSP-62, utvärdering av hur vi arbetat med AI).
 - **Felformat:** alla fel är `{"detail": "<begripligt svenskt meddelande>"}`, aldrig
   stacktrace, SQL eller engelska fältnamn. Fel datatyp eller trasig JSON ger
   "Ogiltig indata." (CORE-17, B9). Id som inte är heltal ger 404 "Ärendet finns inte." (B8).
