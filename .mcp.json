@@ -3,7 +3,7 @@
     "boldkit": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "@boldkit/mcp"]
+      "args": ["-y", "@boldkit/mcp@0.1.0"]
     }
   }
 }
