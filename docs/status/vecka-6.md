@@ -1,6 +1,6 @@
 # Veckostatus vecka 6: det centrala flödet
 
-> Senast uppdaterat torsdag 2026-10-29 (Azalea).
+> Senast uppdaterat torsdag 2026-10-29 kväll (Azalea).
 > Jämför med veckans förväntningar i Disco. Id förklaras kort: **KSP-xx** är ärenden i
 > [Linear: Kundserviceportalen](https://linear.app/grupp6/project/kundserviceportalen-be4a4840b5ef),
 > **CORE-xx** är kraven för kärnan ([SPEC-karna.md](../specs/SPEC-karna.md)) och **HIST-xx**
@@ -43,8 +43,12 @@ Teamets plan för veckan (milstolpe 03 Case Management i Linear):
 | Historiken: tabellen `ticket_history`, där varje nytt ärende får posten `created` (HIST-01) och varje statusbyte skriver ny status och posten `status_changed` i samma transaktion (HIST-02, ADR-001). Samma status avvisas i servicen, så ingen post "x → x" skrivs (servicedelen av HIST-07). SQLite kontrollerar att varje post pekar på ett riktigt ärende (KSP-33, KSP-34) | Azalea | PR #44 (historiken skrivs med status i samma transaktion): https://github.com/desiboli/kundportal-ai-native-development/pull/44 · godkänd av Nicklas, mergad 2026-10-28 |
 | Läsa historiken: `GET /tickets/{id}/history` ger ett ärendes poster äldst först (HIST-03), med samma tid ordnat efter id (HIST-11). Ett ärende utan byten ger bara `created` (HIST-12), och ett okänt id ger 404 (HIST-08). Flyttad från vecka 7, eftersom Nicklas tester för statusreglerna läser historiken (KSP-35) | Azalea | PR #45 (läsa historiken, GET /tickets/{id}/history): https://github.com/desiboli/kundportal-ai-native-development/pull/45 · godkänd av Nicklas, mergad 2026-10-29 |
 | Ny regel i AGENTS.md: statusar skickas och sparas som koder (`new`, `in_progress` …), svenska etiketter bara i UI (KSP-10, teamets AI-arbetssätt) | Azalea | PR #46 (AGENTS.md, statusar skickas som koder): https://github.com/desiboli/kundportal-ai-native-development/pull/46 · godkänd av Nicklas, mergad 2026-10-29 |
-| Ändra status: `PATCH /tickets/{id}/status` byter status och skriver historikposten i samma transaktion. Okänd eller saknad status ger 422 (HIST-06), samma status 409 (HIST-07), okänt ärende 404 (HIST-08), och ett avslutat ärende kan öppnas igen (HIST-13). `{"status": null}` och andra fält än `status` ger "Ogiltig indata." (HIST-spec v0.9, svar på Nicklas frågor i PR #43). Byggt mot Nicklas tester för statusreglerna (KSP-27) (KSP-24) | Azalea (kod), Nicklas (tester) | PR #49 (ändra status, PATCH /tickets/{id}/status): https://github.com/desiboli/kundportal-ai-native-development/pull/49 · öppen, granskare Nicklas |
-| Ansvarsdokumentet till "Bekräftat" och de fyra statusarna motiverade i HIST-specen (KSP-13) | Azalea | PR #48 (ansvaret bekräftat och statusarna motiverade): https://github.com/desiboli/kundportal-ai-native-development/pull/48 · öppen |
+| Ändra status: `PATCH /tickets/{id}/status` byter status och skriver historikposten i samma transaktion. Okänd eller saknad status ger 422 (HIST-06), samma status 409 (HIST-07), okänt ärende 404 (HIST-08), och ett avslutat ärende kan öppnas igen (HIST-13). `{"status": null}` och andra fält än `status` ger "Ogiltig indata." (HIST-spec v0.9, svar på Nicklas frågor i PR #43). Byggt mot Nicklas tester för statusreglerna (KSP-27) (KSP-24) | Azalea (kod), Nicklas (tester) | PR #49 (ändra status, PATCH /tickets/{id}/status): https://github.com/desiboli/kundportal-ai-native-development/pull/49 · godkänd av Nicklas, mergad 2026-10-29 |
+| Ansvarsdokumentet till "Bekräftat" och de fyra statusarna motiverade i HIST-specen (KSP-13) | Azalea | PR #48 (ansvaret bekräftat och statusarna motiverade): https://github.com/desiboli/kundportal-ai-native-development/pull/48 · godkänd av Nicklas, öppen. Konflikten med v0.9 i HIST-specen är löst |
+| CORE-spec v0.5: CORE-01 (giltigt ärende ger 201) kräver också att ärendet sparas | Nicklas | PR #36 (CORE-01 kräver att ärendet sparas): https://github.com/desiboli/kundportal-ai-native-development/pull/36 · godkänd av Azalea, mergad 2026-10-28 |
+| BOLDkit-temat i frontenden, med komponenterna badge och card (KSP-59) | Amalia | PR #38 (BOLDkit-tema med badge och card): https://github.com/desiboli/kundportal-ai-native-development/pull/38 · mergad 2026-10-28 |
+| CORE-tester för beskrivningens längd, tomma fält och hur tecken räknas (KSP-26) | Nicklas | PR #39 (beskrivningens längd, tomma fält och tecken): https://github.com/desiboli/kundportal-ai-native-development/pull/39 · godkänd av Azalea, mergad 2026-10-29 |
+| Körresultat, förväntat resultat och länkar till testerna i verifieringsplanen (KSP-47) | Nicklas | PR #42 (körresultat och testförslag från AI 2026-10-28): https://github.com/desiboli/kundportal-ai-native-development/pull/42 · godkänd av Azalea, mergad 2026-10-29 |
 
 ## Verifierat
 
@@ -137,22 +141,22 @@ Teamets plan för veckan (milstolpe 03 Case Management i Linear):
 | `max_length` på rubrik och beskrivning kontrolleras före trimningen (Nicklas granskning av PR #26 (API-kontraktet i OpenAPI med fem stubbar): https://github.com/desiboli/kundportal-ai-native-development/pull/26) | CORE-12 och B10 säger att längden räknas efter trimning, så 100 tecken med mellanslag runt ska godkännas | Rättat i PR #34 (ärendemodell och POST /tickets med trimning): https://github.com/desiboli/kundportal-ai-native-development/pull/34, med test (`test_core12_100_chars_after_trim_is_accepted`) |
 | Ska andra okända fält än `status` avvisas i `POST /tickets`? (`extra="forbid"`) | CORE-09 gäller bara `status` | Azalea beslutade 2026-10-27: ja, andra okända fält ger bara "Ogiltig indata." (byggt i KSP-21). Nicklas bekräftar i granskningen av PR #30 (svenskt felformat i backenden): https://github.com/desiboli/kundportal-ai-native-development/pull/30 och lägger det i så fall i CORE-specen |
 | `docs/ansvar-och-granskning.md` har kvar rader med "Förslag" | Ansvaret bekräftades på teammötet 2026-10-25 | Azalea (KSP-13), i PR #48 (ansvaret bekräftat och statusarna motiverade): https://github.com/desiboli/kundportal-ai-native-development/pull/48 |
-| PR #43 (statusreglerna) får inte mergas ensam | Testerna faller på 501 tills statusbytet finns, så `main` skulle bli röd | Testerna kommer in via PR #49 (ändra status), där Nicklas commit följer med. #43 stängs när #49 är mergad |
-| Frontend för det centrala flödet saknas | På `main` finns skelettet och BOLDkit-temat, men ingen lista, inget formulär och ingen detaljvy. Backenden för att skapa, lista, visa och byta status är klar eller i granskning | Mustafa (KSP-28–30) och Amalia (KSP-31, KSP-32), frågat i Slack 2026-10-28 och 2026-10-29 |
-| HIST-specen v0.8 i #48 och v0.9 i #49 | Båda ändrar rad 3 i specen | Den PR som mergas sist löser konflikten för hand |
+| PR #43 (statusreglerna) är kvar som öppen | Nicklas tester kom in på `main` via PR #49 (ändra status), där hans commit följde med | Nicklas stänger #43 nu när #49 är mergad |
+| Frontend för det centrala flödet saknas | På `main` finns skelettet och BOLDkit-temat, men ingen lista, inget formulär och ingen detaljvy. Backenden för att skapa, lista, visa och byta status är klar | Mustafa (KSP-28–30) och Amalia (KSP-31, KSP-32), frågat i Slack 2026-10-28 och 2026-10-29 |
+| HIST-specen v0.8 i #48 och v0.9 i #49 | Båda ändrade rad 3 i specen | Löst i #48 (commit `669ccda`): specen blir v0.9 med båda ändringarna |
 
 ## Nästa steg
 
 | Vad | Ansvarig |
 | --- | --- |
-| Granska PR #49 (ändra status, PATCH /tickets/{id}/status): https://github.com/desiboli/kundportal-ai-native-development/pull/49 | Nicklas |
-| Beteendetester för `{"status": null}` och andra fält i `PATCH` (HIST-06), som en egen liten PR efter #49 | Nicklas |
-| Merga PR #39 (CORE-tester, KSP-26) och #42 (verifieringsplanen, KSP-47) när trådarna är lösta | Nicklas |
-| Rätta PR #47 (skills för agenter) efter granskningen | Mustafa |
-| Test, status och förväntat resultat för HIST-raderna i verifieringsplanen, när #49 är mergad | Azalea (KSP-48) |
+| Merga PR #48 (ansvaret bekräftat och statusarna motiverade): https://github.com/desiboli/kundportal-ai-native-development/pull/48 | Azalea |
+| Granska PR #50 (ADR-002, BOLDkit valt för utseendet, KSP-9): https://github.com/desiboli/kundportal-ai-native-development/pull/50 | Azalea, Amalia |
+| Beteendetester för `{"status": null}` och andra fält i `PATCH` (HIST-06), som en egen liten PR | Nicklas |
+| Rätta PR #47 (skills för testförslag, API-typer och BOLDkit) efter granskningen: https://github.com/desiboli/kundportal-ai-native-development/pull/47 | Mustafa |
+| Test, status och förväntat resultat för HIST-raderna i verifieringsplanen | Azalea (KSP-48) |
 | Bestämma hur FastAPI:s engelska 422 (`HTTPValidationError`) tas bort ur `/openapi.json` | Mustafa och Azalea |
 | Generera TypeScript-typer från `/openapi.json`, sedan ärendelistan och formuläret | Mustafa (KSP-28–30) |
-| Detaljvyn mot `GET /tickets/{id}`, och statusbytet i UI när #49 är mergad | Amalia (KSP-31, KSP-32) |
+| Detaljvyn mot `GET /tickets/{id}`, och statusbytet i UI (backenden är klar) | Amalia (KSP-31, KSP-32) |
 | Länka vecka 6, `docs/verifiering.md`, AGENTS.md och `docs/ai/` från den löpande PR:n (Technigo#2): https://github.com/Technigo/kundportal-ai-native-development/pull/2 | Mustafa (KSP-56) |
 | Teamets AI-arbetsflöde, `docs/ai/arbetssatt.md` | Azalea (KSP-60) |
 | Fördela ärenden utan ägare på nästa möte: KSP-18 (frontendtester i CI), KSP-54 och KSP-55 (veckostatus V7 och V8), KSP-57 (demon), KSP-58 (slutleveransen), KSP-61–63 | Alla |
