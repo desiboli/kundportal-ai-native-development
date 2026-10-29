@@ -4,16 +4,14 @@ The frontend generates its types from this schema (KSP-28), so these tests check
 shape of requests, responses and errors, not behaviour. Behaviour is tested per
 requirement id (CORE-xx, HIST-xx) when each endpoint is built.
 
-The 501 tests at the bottom are temporary: each one is replaced by behaviour tests in
-the KSP issue that builds that endpoint.
+The 501 tests for the stubs were temporary and are gone: the last one was removed in KSP-24,
+when PATCH /tickets/{id}/status was built. Behaviour is tested in test_create_ticket.py,
+test_core_read.py, test_read_history.py, test_history.py and test_status_rules.py.
 """
 
 import re
 
 import pytest
-
-# Must match the text in app/api/tickets.py (KSP-20 decision 4).
-NOT_IMPLEMENTED = "Funktionen är inte klar än."
 
 # (method, path as written in the schema, success status code)
 ENDPOINTS = [
@@ -156,13 +154,20 @@ def test_ticket_create_has_length_limits_and_no_status(openapi):
 
 
 def test_status_change_body_takes_only_a_valid_status(openapi):
-    """HIST section 5: the PATCH body is {"status": <status>}."""
-    # Catches: a PATCH body without the status enum.
+    """HIST section 5: the PATCH body is {"status": <status>} and nothing else.
+
+    Other fields, e.g. {"status": "closed", "title": "x"}, are rejected with "Ogiltig
+    indata.", the same as unknown fields in POST (decided in PR #43, 2026-10-29).
+    """
+    # Catches: a PATCH body without the status enum, or other fields being ignored, so a
+    # client could believe that the title was changed when it was not.
     operation = openapi["paths"]["/tickets/{ticket_id}/status"]["patch"]
     body = resolve(openapi, operation["requestBody"]["content"]["application/json"]["schema"])
 
+    assert set(body["properties"]) == {"status"}
     assert body["required"] == ["status"]
     assert enum_values(openapi, body["properties"]["status"]) == STATUSES
+    assert body["additionalProperties"] is False
 
 
 def test_history_entry_fields_match_spec(openapi):
@@ -202,22 +207,3 @@ def test_error_responses_are_declared_with_detail(openapi, method, path, status)
 
     assert schema["properties"]["detail"]["type"] == "string"
     assert schema["required"] == ["detail"]
-
-
-# (method, real URL with id 1, body) for each stub. POST /tickets was removed in KSP-22
-# (behaviour tests in test_create_ticket.py), GET /tickets and GET /tickets/{id} in KSP-23
-# (test_core_read.py), and GET /tickets/{id}/history in KSP-35 (test_read_history.py).
-STUB_CALLS = [
-    ("patch", "/tickets/1/status", {"status": "in_progress"}),
-]
-
-
-@pytest.mark.parametrize("method, url, body", STUB_CALLS)
-def test_stub_returns_501_with_swedish_detail(client, method, url, body):
-    """KSP-20 decision 4: unbuilt endpoints answer 501 "Funktionen är inte klar än."."""
-    # Catches: a stub that pretends to work (200 with no data) or leaks FastAPI's
-    # English default. Temporary, see the module docstring.
-    response = client.request(method, url, json=body)
-
-    assert response.status_code == 501
-    assert response.json() == {"detail": NOT_IMPLEMENTED}
