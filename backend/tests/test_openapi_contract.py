@@ -205,11 +205,10 @@ def test_error_responses_are_declared_with_detail(openapi, method, path, status)
 
 
 # (method, real URL with id 1, body) for each stub. POST /tickets was removed in KSP-22
-# (behaviour tests in test_create_ticket.py), and GET /tickets and GET /tickets/{id} in
-# KSP-23 (behaviour tests in test_core_read.py).
+# (behaviour tests in test_create_ticket.py), GET /tickets and GET /tickets/{id} in KSP-23
+# (test_core_read.py), and GET /tickets/{id}/history in KSP-35 (test_read_history.py).
 STUB_CALLS = [
     ("patch", "/tickets/1/status", {"status": "in_progress"}),
-    ("get", "/tickets/1/history", None),
 ]
 
 

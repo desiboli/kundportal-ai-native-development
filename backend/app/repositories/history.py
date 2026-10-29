@@ -1,9 +1,9 @@
-"""Writing history entries (KSP-33). Commit is left to the service.
+"""Writing and reading history entries (KSP-33, KSP-35). Commit is left to the service.
 
 There is deliberately no update or delete: history entries are never changed (AGENTS.md).
-Reading the history for the API comes in KSP-35 (GET /tickets/{id}/history).
 """
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.history import HistoryRow
@@ -20,3 +20,13 @@ class HistoryRepository:
         self.session.add(row)
         self.session.flush()
         return row
+
+    def list_for_ticket(self, ticket_id: int) -> list[HistoryRow]:
+        """One ticket's entries, oldest first (HIST-03). id breaks ties at the same time (HIST-11)."""
+        # occurred_at is text in a fixed format, so sorting it as text is sorting by time.
+        query = (
+            select(HistoryRow)
+            .where(HistoryRow.ticket_id == ticket_id)
+            .order_by(HistoryRow.occurred_at, HistoryRow.id)
+        )
+        return list(self.session.scalars(query))
