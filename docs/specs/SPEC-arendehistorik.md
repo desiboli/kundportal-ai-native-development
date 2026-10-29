@@ -1,6 +1,6 @@
 # Spec: Statuslogik och ärendehistorik (kompletterande funktion)
 
-> Status: **v0.7, luckor från testförslagskörningarna fyllda** · Ansvarig: Azalea (Azaalea) · Vecka 5
+> Status: **v0.8, statusarna motiverade** · Ansvarig: Azalea (Azaalea) · Vecka 5
 > Detta dokument är teamets underlag. Individuell redovisning ligger inte här.
 >
 > **Ändrat i v0.3 (2026-10-23), efter feedback från teamet:** kärnan får en
@@ -23,6 +23,8 @@
 > sparas (HIST-09, 503), vad omstart betyder i testet (HIST-04), vem som äger testerna för
 > HIST-07, ADR-001 i `docs/decisions/`. Statusbytet hör till milstolpe 03, eftersom
 > examinationen räknar "ändra status" till kärnan. Historiken är tilläggsfunktionen (04).
+>
+> **Ändrat i v0.8 (2026-10-29):** motivering av de fyra statusarna i antagande 2.
 
 **Gemensamma dokument (huvudversioner) i repot.** Delar av specen gäller hela teamet och
 har därför fått egna dokument. Specen är fortfarande komplett, men vid skillnad gäller det
@@ -124,6 +126,14 @@ Azalea bygger inte frontend. Hon granskar frontend-PR:er som rör API-kontraktet
 
    Alla övergångar mellan *olika* statusar är tillåtna, inklusive att öppna ett avslutat
    ärende igen. Nya ärenden får alltid `new`.
+
+   **Varför just de här fyra:** de följer exemplet i examinationsuppgiften och täcker ett
+   ärendes väg utan att överlappa. `waiting_on_customer` skiljer väntan på kunden från eget
+   arbete (`in_progress`), så att det syns vilka ärenden handläggaren själv behöver göra
+   något åt. `closed` kan öppnas igen (HIST-13), eftersom en kund kan höra av sig om samma
+   sak. Historiken visar ändå att ärendet öppnats igen, så en femte status som "Återöppnat"
+   behövs inte. Fler statusar (till exempel "Eskalerat") lämnades utanför för att hålla
+   första versionen liten.
 3. Tider lagras som UTC i ett fast format (`YYYY-MM-DDTHH:MM:SS.ffffffZ`, alltid
    mikrosekunder) så att textsortering blir korrekt, och visas i lokal tid i UI.
 4. Allt språk mot användaren är svenska. API-fältnamn och statuskoder är engelska.
