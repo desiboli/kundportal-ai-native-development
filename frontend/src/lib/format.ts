@@ -1,4 +1,4 @@
-// Swedish standard format, YYYY-MM-DD HH:MM (KSP-31 AC6).
+// Swedish standard format, YYYY-MM-DD HH:MM (same as the detail view, KSP-31).
 const dateTimeFormat = new Intl.DateTimeFormat("sv-SE", {
   year: "numeric",
   month: "2-digit",

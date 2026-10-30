@@ -1,4 +1,5 @@
 import { act, render, screen } from "@testing-library/react"
+import { createMemoryRouter, RouterProvider } from "react-router"
 import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from "vitest"
 
 import type { Ticket } from "@/api/types"
@@ -44,6 +45,15 @@ function fakeBackend(): Mock {
   })
 }
 
+// Renders the page on its route, as in App.tsx (KSP-31 AC5: /tickets/{id} with react-router).
+function renderAt(path: string) {
+  const router = createMemoryRouter([{ path: "/tickets/:id", element: <TicketDetailPage /> }], {
+    initialEntries: [path],
+  })
+  render(<RouterProvider router={router} />)
+  return router
+}
+
 function requestedUrls(fetchMock: Mock): string[] {
   return fetchMock.mock.calls.map((call) => call[0] as string)
 }
@@ -58,14 +68,11 @@ describe("TicketDetailPage", () => {
 
   afterEach(() => {
     vi.unstubAllGlobals()
-    window.location.hash = ""
   })
 
   it("KSP-31: shows a loading skeleton while the ticket loads", () => {
     fetchMock.mockReturnValue(new Promise(() => {}))
-    window.location.hash = "#/tickets/5"
-
-    render(<TicketDetailPage />)
+    renderAt("/tickets/5")
 
     const loading = screen.getByRole("status", { name: LOADING })
     expect(loading).toHaveAttribute("aria-busy", "true")
@@ -74,32 +81,25 @@ describe("TicketDetailPage", () => {
   })
 
   it("KSP-31: loading skeleton disappears when the ticket has loaded", async () => {
-    window.location.hash = "#/tickets/5"
-
-    render(<TicketDetailPage />)
+    renderAt("/tickets/5")
 
     expect(await screen.findByText(ticket5.title)).toBeInTheDocument()
     expect(screen.queryByRole("status", { name: LOADING })).not.toBeInTheDocument()
   })
 
   it("CORE-04: requests the ticket with the id from the URL", async () => {
-    window.location.hash = "#/tickets/5"
-
-    render(<TicketDetailPage />)
+    renderAt("/tickets/5")
 
     await screen.findByText(ticket5.title)
     expect(requestedUrls(fetchMock)).toEqual(["/api/tickets/5"])
   })
 
   it("CORE-04: loads the new ticket when the URL changes", async () => {
-    window.location.hash = "#/tickets/5"
-    render(<TicketDetailPage />)
+    const router = renderAt("/tickets/5")
     await screen.findByText(ticket5.title)
 
     // Same as following a link or pressing the back button.
-    act(() => {
-      window.location.hash = "#/tickets/6"
-    })
+    await act(() => router.navigate("/tickets/6"))
 
     expect(await screen.findByText(ticket6.title)).toBeInTheDocument()
     expect(requestedUrls(fetchMock)).toContain("/api/tickets/6")
@@ -107,9 +107,7 @@ describe("TicketDetailPage", () => {
   })
 
   it("CORE-04: shows title, description and id", async () => {
-    window.location.hash = "#/tickets/5"
-
-    render(<TicketDetailPage />)
+    renderAt("/tickets/5")
 
     expect(await screen.findByText(ticket5.title)).toBeInTheDocument()
     expect(screen.getByText(/Kunden väntar på en beställning/)).toBeInTheDocument()
@@ -117,9 +115,7 @@ describe("TicketDetailPage", () => {
   })
 
   it("CORE-04: shows Swedish labels, never codes", async () => {
-    window.location.hash = "#/tickets/5"
-
-    render(<TicketDetailPage />)
+    renderAt("/tickets/5")
 
     await screen.findByText(ticket5.title)
     expect(screen.getByText("Leverans")).toBeInTheDocument()
@@ -131,9 +127,7 @@ describe("TicketDetailPage", () => {
   it("CORE-04: shows created_at in local time", async () => {
     // The test setup fixes the time zone to Europe/Stockholm. Daylight saving time ended
     // the night before, so 09:00 UTC is 10:00 local time. Format YYYY-MM-DD HH:MM (KSP-31 AC6).
-    window.location.hash = "#/tickets/5"
-
-    render(<TicketDetailPage />)
+    renderAt("/tickets/5")
 
     await screen.findByText(ticket5.title)
     expect(screen.getByText("2026-10-25 10:00")).toBeInTheDocument()
@@ -142,9 +136,7 @@ describe("TicketDetailPage", () => {
   })
 
   it("CORE-04: shows the description exactly as saved", async () => {
-    window.location.hash = "#/tickets/5"
-
-    render(<TicketDetailPage />)
+    renderAt("/tickets/5")
 
     await screen.findByText(ticket5.title)
     // getByText collapses whitespace, so the line break is checked on textContent.
@@ -153,9 +145,7 @@ describe("TicketDetailPage", () => {
   })
 
   it("CORE-10: unknown ticket shows the message from the API", async () => {
-    window.location.hash = "#/tickets/999"
-
-    render(<TicketDetailPage />)
+    renderAt("/tickets/999")
 
     expect(await screen.findByText("Ärendet finns inte.")).toBeInTheDocument()
     expect(screen.queryByText("Kategori")).not.toBeInTheDocument()
@@ -163,9 +153,7 @@ describe("TicketDetailPage", () => {
   })
 
   it("CORE-10: non-integer id is sent to the API and shows the message", async () => {
-    window.location.hash = "#/tickets/abc"
-
-    render(<TicketDetailPage />)
+    renderAt("/tickets/abc")
 
     expect(await screen.findByText("Ärendet finns inte.")).toBeInTheDocument()
     expect(requestedUrls(fetchMock)).toEqual(["/api/tickets/abc"])

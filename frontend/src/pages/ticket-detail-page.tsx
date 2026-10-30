@@ -1,20 +1,21 @@
 import { useEffect, useState } from "react"
+import { useParams } from "react-router"
 
 import { fetchTicket, type TicketResult } from "@/api/tickets"
 import { TicketDetails } from "@/components/ticket-details"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useTicketIdFromHash } from "@/lib/use-ticket-id-from-hash"
 
-// Detail view for one ticket (KSP-31): fetched by the id in the address (CORE-04), with a
-// skeleton while it loads, and the message from the API for an unknown id (CORE-10).
+// Detail view for one ticket (KSP-31) on /tickets/:id (AC5): fetched by its id (CORE-04),
+// with a skeleton while it loads, and the message from the API for an unknown id (CORE-10).
+// The id is kept as text, also "abc": the API decides what is unknown.
 export function TicketDetailPage() {
-  const ticketId = useTicketIdFromHash()
+  const ticketId = useParams().id
   // The result remembers which id it belongs to, so a new id means loading again.
   const [loaded, setLoaded] = useState<{ id: string; result: TicketResult } | null>(null)
 
   useEffect(() => {
-    if (ticketId === null) return
+    if (ticketId === undefined) return
     let active = true
     void fetchTicket(ticketId).then((result) => {
       if (active) setLoaded({ id: ticketId, result })
@@ -24,7 +25,7 @@ export function TicketDetailPage() {
     }
   }, [ticketId])
 
-  if (ticketId === null) return null
+  if (ticketId === undefined) return null
 
   const result = loaded?.id === ticketId ? loaded.result : null
 

@@ -3,8 +3,8 @@ import type { ReactNode } from "react"
 import type { Ticket } from "@/api/types"
 import { StatusBadge } from "@/components/status-badge"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { categoryLabel, priorityLabel } from "@/labels"
 import { formatLocalDateTime } from "@/lib/format"
-import { categoryLabels, priorityLabels } from "@/lib/labels"
 
 // All fields of a ticket (CORE-04), laid out as decided in KSP-31 AC8: id and title in a
 // header with the primary colour, then category and created on the left, status and
@@ -22,7 +22,7 @@ export function TicketDetails({ ticket }: { ticket: Ticket }) {
       <CardContent className="flex flex-col gap-6">
         <dl className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
           <div className="flex flex-col gap-4">
-            <Field label="Kategori">{categoryLabels[ticket.category]}</Field>
+            <Field label="Kategori">{categoryLabel(ticket.category)}</Field>
             <Field label="Skapad">
               <time dateTime={ticket.created_at}>{formatLocalDateTime(ticket.created_at)}</time>
             </Field>
@@ -31,7 +31,7 @@ export function TicketDetails({ ticket }: { ticket: Ticket }) {
             <Field label="Status">
               <StatusBadge status={ticket.status} />
             </Field>
-            <Field label="Prioritet">{priorityLabels[ticket.priority]}</Field>
+            <Field label="Prioritet">{priorityLabel(ticket.priority)}</Field>
           </div>
         </dl>
 
