@@ -3,6 +3,7 @@ import { MemoryRouter } from "react-router"
 import { afterEach, describe, expect, it, vi } from "vitest"
 
 import type { components } from "@/api/schema"
+import { formatLocalDateTime } from "@/lib/format"
 
 import { TicketListPage } from "./TicketListPage"
 
@@ -15,7 +16,7 @@ function ticket(overrides: Partial<Ticket> & Pick<Ticket, "id" | "title">): Tick
     category: "billing",
     priority: "high",
     status: "new",
-    created_at: "2026-10-25T09:00:00.000000Z",
+    created_at: "2026-10-25T09:00:00.701559Z",
     ...overrides,
   }
 }
@@ -93,11 +94,9 @@ describe("Ticket list", () => {
     expect(
       screen.queryByText("Kunden har fått dubbel debitering för oktober."),
     ).not.toBeInTheDocument()
-    const created = new Date("2026-10-25T09:00:00.000000Z").toLocaleString(
-      "sv-SE",
-      { dateStyle: "short", timeStyle: "short" },
-    )
-    expect(screen.getByText(created)).toBeInTheDocument()
+    expect(
+      screen.getByText(formatLocalDateTime("2026-10-25T09:00:00.701559Z")),
+    ).toBeInTheDocument()
   })
 
   // CORE-15: an empty list is a message, not an error.

@@ -12,9 +12,9 @@ import {
   EmptyStateTitle,
 } from "@/components/ui/empty-state"
 import { Skeleton } from "@/components/ui/skeleton"
+import { formatLocalDateTime } from "@/lib/format"
 import {
   categoryLabel,
-  formatCreatedAt,
   priorityLabel,
   statusBadgeVariant,
   statusLabel,
@@ -72,9 +72,9 @@ export function TicketListPage() {
         <div role="status" aria-live="polite" aria-busy="true">
           <p className="sr-only">Hämtar ärenden …</p>
           <div className="flex flex-col gap-4">
-            <Skeleton className="h-24 w-full" />
-            <Skeleton className="h-24 w-full" />
-            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" variant="blocks" />
+            <Skeleton className="h-24 w-full" variant="blocks" />
+            <Skeleton className="h-24 w-full" variant="blocks" />
           </div>
         </div>
       )}
@@ -106,7 +106,7 @@ export function TicketListPage() {
                     <Badge variant={statusBadgeVariant(ticket.status)}>
                       {statusLabel(ticket.status)}
                     </Badge>
-                    <p>{formatCreatedAt(ticket.created_at)}</p>
+                    <p>{formatLocalDateTime(ticket.created_at)}</p>
                   </CardContent>
                 </Card>
               </Link>

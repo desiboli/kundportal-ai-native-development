@@ -29,24 +29,19 @@ export const statusLabels: Record<Status, string> = {
   closed: "Avslutat",
 }
 
-const unknownLabel = "Okänd"
-
-export function categoryLabel(code: string): string {
-  if (code in categoryLabels) return categoryLabels[code as Category]
-  return unknownLabel
+export function categoryLabel(code: Category): string {
+  return categoryLabels[code]
 }
 
-export function priorityLabel(code: string): string {
-  if (code in priorityLabels) return priorityLabels[code as Priority]
-  return unknownLabel
+export function priorityLabel(code: Priority): string {
+  return priorityLabels[code]
 }
 
-export function statusLabel(code: string): string {
-  if (code in statusLabels) return statusLabels[code as Status]
-  return unknownLabel
+export function statusLabel(code: Status): string {
+  return statusLabels[code]
 }
 
-type StatusBadgeVariant = "info" | "accent" | "warning" | "secondary" | "outline"
+type StatusBadgeVariant = "info" | "accent" | "warning" | "secondary"
 
 const statusBadgeVariants: Record<Status, StatusBadgeVariant> = {
   new: "info",
@@ -55,15 +50,6 @@ const statusBadgeVariants: Record<Status, StatusBadgeVariant> = {
   closed: "secondary",
 }
 
-export function statusBadgeVariant(code: string): StatusBadgeVariant {
-  if (code in statusBadgeVariants) return statusBadgeVariants[code as Status]
-  return "outline"
-}
-
-// Local time, date and hour:minute (API conventions, section 3).
-export function formatCreatedAt(iso: string): string {
-  return new Date(iso).toLocaleString("sv-SE", {
-    dateStyle: "short",
-    timeStyle: "short",
-  })
+export function statusBadgeVariant(code: Status): StatusBadgeVariant {
+  return statusBadgeVariants[code]
 }
