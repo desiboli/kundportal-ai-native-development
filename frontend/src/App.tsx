@@ -1,22 +1,30 @@
 import { useEffect, useState } from "react"
 
+import type { components, operations } from "@/api/schema"
 import { Button } from "@/components/ui/button"
 
+// UI state for the start page. The JSON bodies below come from the generated
+// OpenAPI types (KSP-28: TypeScript types generated from OpenAPI).
 type Health =
   | { state: "loading" }
   | { state: "ok"; database: string }
   | { state: "error"; message: string }
 
+type HealthBody =
+  operations["health_health_get"]["responses"][200]["content"]["application/json"]
+type ErrorBody = components["schemas"]["ErrorResponse"]
+
 // Fetches /health through the Vite proxy (see vite.config.ts) and maps the response to a state.
 async function fetchHealth(): Promise<Health> {
   try {
     const response = await fetch("/api/health")
-    const data = await response.json()
     if (response.ok) {
+      const data = (await response.json()) as HealthBody
       return { state: "ok", database: data.database }
     }
     // On errors the backend always responds with {"detail": "<Swedish message>"}.
-    return { state: "error", message: data.detail ?? "Okänt fel." }
+    const data = (await response.json()) as ErrorBody
+    return { state: "error", message: data.detail }
   } catch {
     return {
       state: "error",
