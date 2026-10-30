@@ -2,6 +2,8 @@ import { useEffect, useState } from "react"
 
 import type { components, operations } from "@/api/schema"
 import { Button } from "@/components/ui/button"
+import { useTicketIdFromHash } from "@/lib/use-ticket-id-from-hash"
+import { TicketDetailPage } from "@/pages/ticket-detail-page"
 
 // UI state for the start page. The JSON bodies below come from the generated
 // OpenAPI types (KSP-28: TypeScript types generated from OpenAPI).
@@ -34,7 +36,13 @@ async function fetchHealth(): Promise<Health> {
   }
 }
 
+// #/tickets/{id} opens the detail view (KSP-31 AC5), every other address the start page.
 export function App() {
+  const ticketId = useTicketIdFromHash()
+  return ticketId === null ? <HealthCheck /> : <TicketDetailPage />
+}
+
+function HealthCheck() {
   const [health, setHealth] = useState<Health>({ state: "loading" })
 
   useEffect(() => {
