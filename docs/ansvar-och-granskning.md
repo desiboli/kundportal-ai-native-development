@@ -1,9 +1,8 @@
 # Ansvar och granskning
 
-> Teamets arbetsfördelning. Speglas från Linear-dokumentet
-> [Gemensamt · Ansvar och granskning](https://linear.app/grupp6/document/gemensamt-ansvar-och-granskning-fa06c24358e0)
-> per 2026-10-24. Bekräftat = överenskommet i Slack 2026-10-22–23. Förslag = tas upp på
-> teammötet söndag 2026-10-25.
+> Teamets arbetsfördelning. **Alla rader bekräftades på teammötet 2026-10-25.** Repot är
+> huvudversion. Linear-dokumentet "Gemensamt · Ansvar och granskning" pekar hit.
+> Ändringar görs via PR.
 
 ## Princip
 
@@ -23,27 +22,28 @@
 | **Azalea** (Azaalea) | Backend som helhet: skelett, kärnans API, statuslogik och historik, API-kontraktet |
 | **Nicklas** (yrrving) | CORE-specen, tester för statusregler och validering, verifieringsplanen, teknikbeslutet om stacken |
 | **Mustafa** (desiboli) | Frontend och Linear |
-| **Amalia** (amaliaa-91) | Tidslinje (HIST-05) och felmeddelanden i UI (HIST-14) |
+| **Amalia** (amaliaa-91) | Tidslinje (HIST-05) och UI-delen av HIST-14 (hur felmeddelanden visas) |
 
 ## Ansvarstabell
 
 | Del | Ansvarig | Granskare | Läge |
 | --- | --- | --- | --- |
-| **Backend som helhet:** skelett, SQLite, kärnans API (CORE) och `/health` | Azalea | Nicklas | Förslag |
-| Statusregler, historik, transaktionsgräns, ADR-001 | Azalea | Nicklas | Bekräftat |
-| API-kontrakt som OpenAPI (`/openapi.json`), klart innan frontend bygger mot det | Azalea | Mustafa | Förslag |
-| Tester för historik, atomicitet och persistens: **HIST-01, 02, 03, 04, 08, 09, 10, 11, 12** och invarianttestet | Azalea | Nicklas | Förslag |
-| Spec för kärnan (**CORE-01, 02 …**) | Nicklas | Azalea | Förslag (Nicklas erbjöd sig) |
-| Tester för statusregler: **HIST-06, 07, 13** | Nicklas | Azalea | Bekräftat |
-| Tester för kärnans validering (CORE-kriterierna) | Nicklas | Azalea | Förslag |
-| Teamets verifieringsplan (`docs/verifiering.md`), HIST-raderna skrivs av Azalea | Nicklas | Azalea | Bekräftat |
-| Teknikbeslut om stacken (jämförelse och beslut) | Nicklas | Alla | Förslag |
-| Mutationsprövning, **korsvis**: var och en prövar sina egna tester, den andra lägger in en okänd mutation | Azalea, Nicklas | den andra | Förslag |
-| Instruktion för testförslag: v1 | Nicklas | Azalea | Förslag |
-| Förbättring av instruktionen: **var och en gör en egen, namngiven förbättring**, prövad på egna kriterier och jämförd med v1 | Azalea, Nicklas (var för sig) | den andra | Förslag |
-| Frontend: lista, detaljvy, formulär för att skapa ärenden, statusbyte, vitest | Mustafa | Azalea | Förslag |
-| Tidslinje (HIST-05) och felmeddelanden i UI (HIST-14), inklusive komponenttest för tidslinjen (vitest + Testing Library) | Amalia | Mustafa, Azalea | Valt av Amalia 2026-10-24, bekräftas söndag |
-| Linear: milstolpar, ärenden och mallar (fält för krav-id och "faller testet av rätt anledning?") | Mustafa (mallarna: Nicklas) | Nicklas | Förslag |
+| **Backend som helhet:** skelett, SQLite, kärnans API (CORE) och `/health` | Azalea | Nicklas | Bekräftat 2026-10-25 |
+| Statusregler, historik, transaktionsgräns, ADR-001 | Azalea | Nicklas | Bekräftat 2026-10-25 |
+| API-kontrakt som OpenAPI (`/openapi.json`), klart innan frontend bygger mot det | Azalea | Mustafa | Bekräftat 2026-10-25 |
+| Tester för historik, atomicitet och persistens: **HIST-01, 02, 03, 04, 08, 09, 10, 11, 12** och invarianttestet | Azalea | Nicklas | Bekräftat 2026-10-25 |
+| Backend-delen av HIST-14: alla fel som `{"detail": "<svenska>"}` utan stacktrace eller databasdetaljer | Azalea | Nicklas | Bekräftat 2026-10-25 |
+| Spec för kärnan (**CORE-01, 02 …**) | Nicklas | Azalea | Bekräftat 2026-10-25 |
+| Tester för statusregler: **HIST-06, 07, 13** | Nicklas | Azalea | Bekräftat 2026-10-25 |
+| Tester för kärnans validering (CORE-kriterierna) | Nicklas | Azalea | Bekräftat 2026-10-25 |
+| Teamets verifieringsplan (`docs/verifiering.md`), HIST-raderna skrivs av Azalea | Nicklas | Azalea | Bekräftat 2026-10-25 |
+| Teknikbeslut om stacken (jämförelse och beslut) | Nicklas | Alla | Bekräftat 2026-10-25 |
+| Mutationsprövning, **korsvis**: var och en prövar sina egna tester, den andra lägger in en okänd mutation | Azalea, Nicklas | den andra | Bekräftat 2026-10-25 |
+| Instruktion för testförslag: v1 | Nicklas | Azalea | Bekräftat 2026-10-25 |
+| Förbättring av instruktionen: **var och en gör en egen, namngiven förbättring**, prövad på egna kriterier och jämförd med v1 | Azalea, Nicklas (var för sig) | den andra | Bekräftat 2026-10-25 |
+| Frontend: lista, detaljvy, formulär för att skapa ärenden, statusbyte, vitest | Mustafa | Azalea | Bekräftat 2026-10-25 |
+| Tidslinje (HIST-05) och UI-delen av HIST-14 (hur felmeddelanden visas), inklusive komponenttest för tidslinjen (vitest + Testing Library) | Amalia | Mustafa, Azalea | Bekräftat 2026-10-25 |
+| Linear: milstolpar, ärenden och mallar (fält för krav-id och "faller testet av rätt anledning?") | Mustafa (mallarna: Nicklas) | Nicklas | Bekräftat 2026-10-25 |
 
 ## Granskningspar
 
@@ -54,9 +54,9 @@
 | Frontend | Azalea (API-kontraktet), Amalia eller Mustafa (UI) |
 | Amalias del | Mustafa och Azalea |
 
-## Öppet till söndag
+## Beslut på teammötet 2026-10-25
 
-1. Stacken: FastAPI (förslag) eller TypeScript rakt igenom. Se spec, antagande 1.
-2. Bekräfta raderna som står som Förslag.
-3. Amalias del: Amalia har valt tidslinje och felmeddelanden i UI (HIST-05, 14). Bekräfta, och kom överens med Mustafa om var komponenten sitter i detaljvyn.
-4. Huvudversion för gemensamma dokument: repot eller Linear?
+1. Stacken: FastAPI + SQLAlchemy + SQLite i backenden, React + Vite + TypeScript i frontenden. Jämförelsen står i `docs/decisions/ADR-002-stack.md`.
+2. Alla rader i ansvarstabellen är bekräftade.
+3. Amalias del: tidslinjen (HIST-05) och UI-delen av HIST-14. Backend-delen av HIST-14 (felformatet) är Azaleas.
+4. Huvudversion för gemensamma dokument: repot. Linear används för planering och länkar hit.
