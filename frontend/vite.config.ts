@@ -23,8 +23,10 @@ export default defineConfig({
     },
   },
   // Component tests run in jsdom. The setup file adds the jest-dom and jest-axe matchers.
+  // A fixed time zone makes "local time" the same on every machine and in CI.
   test: {
     environment: "jsdom",
     setupFiles: ["./src/test/setup.ts"],
+    env: { TZ: "Europe/Stockholm" },
   },
 })
