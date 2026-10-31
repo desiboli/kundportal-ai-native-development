@@ -3,6 +3,7 @@ import { useParams } from "react-router"
 
 import { fetchTicket, type TicketResult } from "@/api/tickets"
 import { TicketDetails } from "@/components/ticket-details"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 
@@ -33,8 +34,13 @@ export function TicketDetailPage() {
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-8 p-6">
       {result === null && <TicketDetailsSkeleton />}
       {result?.state === "ok" && <TicketDetails ticket={result.ticket} />}
-      {/* The detail from the API as it is (KSP-31 AC7). How errors look is decided in KSP-38. */}
-      {result?.state === "error" && <p className="text-destructive">{result.message}</p>}
+      {/* The detail from the API as it is (KSP-31 AC7), in the same alert as the ticket list.
+          A link back to the list comes with KSP-38 (error messages in the UI). */}
+      {result?.state === "error" && (
+        <Alert variant="destructive">
+          <AlertDescription>{result.message}</AlertDescription>
+        </Alert>
+      )}
     </main>
   )
 }

@@ -3,6 +3,7 @@ import { createMemoryRouter, RouterProvider } from "react-router"
 import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from "vitest"
 
 import type { Ticket } from "@/api/types"
+import { BACKEND_UNREACHABLE } from "@/pages/HealthPage"
 import { TicketDetailPage } from "./ticket-detail-page"
 
 // Made-up tickets, never real customer data.
@@ -70,6 +71,8 @@ describe("TicketDetailPage", () => {
     vi.unstubAllGlobals()
   })
 
+  // The two loading tests have no CORE or HIST id: they test AC4 in KSP-31 (a skeleton
+  // while the ticket loads), a decision made without a frontend spec.
   it("KSP-31: shows a loading skeleton while the ticket loads", () => {
     fetchMock.mockReturnValue(new Promise(() => {}))
     renderAt("/tickets/5")
@@ -157,5 +160,22 @@ describe("TicketDetailPage", () => {
 
     expect(await screen.findByText("Ärendet finns inte.")).toBeInTheDocument()
     expect(requestedUrls(fetchMock)).toEqual(["/api/tickets/abc"])
+  })
+
+  it("HIST-14: network error shows the shared message in an alert", async () => {
+    // Same text as the ticket list until KSP-38 (error messages in the UI) decides.
+    fetchMock.mockRejectedValue(new TypeError("Failed to fetch"))
+    renderAt("/tickets/5")
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(BACKEND_UNREACHABLE)
+    expect(document.body).not.toHaveTextContent(/Failed to fetch/)
+  })
+
+  it("HIST-14: server error shows the detail from the API in an alert", async () => {
+    fetchMock.mockResolvedValue(jsonResponse({ detail: "Något gick fel. Försök igen." }, 500))
+    renderAt("/tickets/5")
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Något gick fel. Försök igen.")
+    expect(screen.queryByText("Kategori")).not.toBeInTheDocument()
   })
 })

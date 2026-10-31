@@ -1,4 +1,5 @@
 import type { ErrorResponse, Ticket } from "@/api/types"
+import { BACKEND_UNREACHABLE } from "@/pages/HealthPage"
 
 export type TicketResult = { state: "ok"; ticket: Ticket } | { state: "error"; message: string }
 
@@ -14,7 +15,7 @@ export async function fetchTicket(id: string): Promise<TicketResult> {
     const error = (await response.json()) as ErrorResponse
     return { state: "error", message: error.detail }
   } catch {
-    // Placeholder until the error messages in the UI are decided (KSP-38).
-    return { state: "error", message: "Kunde inte hämta ärendet. Försök igen." }
+    // Same text as the ticket list until the error messages in the UI are decided (KSP-38).
+    return { state: "error", message: BACKEND_UNREACHABLE }
   }
 }
