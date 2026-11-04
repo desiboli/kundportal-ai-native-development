@@ -5,7 +5,8 @@ import { ChevronDown, Filter, Search } from "lucide-react"
 
 import type { components, operations } from "@/api/schema"
 import { BACKEND_UNREACHABLE } from "@/api/errors"
-import { CreateTicketForm } from "@/components/create-ticket-form"
+import { TicketPageLayout } from "@/components/ticket-page-layout"
+import { useTicketListRefresh } from "@/components/ticket-list-refresh"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -168,6 +169,7 @@ export function TicketListPage() {
   const [category, setCategory] = useState<Category | "">("")
   const [advancedOpen, setAdvancedOpen] = useState(false)
   const requestId = useRef(0)
+  const refresh = useTicketListRefresh()
 
   const reload = useCallback(() => {
     const id = ++requestId.current
@@ -180,6 +182,13 @@ export function TicketListPage() {
     reload()
   }, [reload])
 
+  // KSP-75: the create button lives in the app header. Reload while this page is mounted.
+  useEffect(() => {
+    if (refresh === null) return
+    refresh.register(reload)
+    return () => refresh.register(null)
+  }, [refresh, reload])
+
   const filtered = useMemo(() => {
     if (list.state !== "ok") return []
     return filterTickets(list.tickets, { query, status, priority, category })
@@ -187,11 +196,8 @@ export function TicketListPage() {
   const filtersActive = status !== "" || priority !== "" || category !== ""
 
   return (
-    <div className="flex min-h-svh flex-col gap-6 p-6">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-bold">Ärenden</h1>
-        <CreateTicketForm onCreated={reload} />
-      </header>
+    <TicketPageLayout>
+      <h1 className="text-2xl font-bold">Ärenden</h1>
       {list.state === "loading" && (
         <div role="status" aria-live="polite" aria-busy="true">
           <p className="sr-only">Hämtar ärenden …</p>
@@ -306,6 +312,6 @@ export function TicketListPage() {
           />
         </div>
       )}
-    </div>
+    </TicketPageLayout>
   )
 }
